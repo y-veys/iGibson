@@ -1,6 +1,7 @@
 from gibson2.core.physics.robot_locomotors import Turtlebot
 from gibson2.core.simulator import Simulator
 from gibson2.core.physics.scene import BuildingScene
+from gibson2.core.physics.scene import StadiumScene
 from gibson2.core.physics.interactive_objects import YCBObject
 from gibson2.utils.utils import parse_config
 import pybullet as p
@@ -11,9 +12,10 @@ from gibson2.core.render.profiler import Profiler
 def main():
     config = parse_config('../configs/turtlebot_demo.yaml')
     s = Simulator(mode='gui', image_width=512, image_height=512)
-    scene = BuildingScene('Rs',
-                          build_graph=True,
-                          pybullet_load_texture=True)
+    #scene = BuildingScene('Rs',
+    #                      build_graph=True,
+    #                      pybullet_load_texture=True)
+    scene = StadiumScene()
     s.import_scene(scene)
     turtlebot = Turtlebot(config)
     s.import_robot(turtlebot)

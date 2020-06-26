@@ -22,7 +22,6 @@ class NavigateEnv(BaseEnv):
     """
     We define navigation environments following Anderson, Peter, et al. 'On evaluation of embodied navigation agents.'
     arXiv preprint arXiv:1807.06757 (2018). (https://arxiv.org/pdf/1807.06757.pdf)
-
     """
     def __init__(
             self,
@@ -181,16 +180,17 @@ class NavigateEnv(BaseEnv):
         """
         if self.mode != 'gui':
             return
-
+        
+        '''
         cyl_length = 0.2
         self.initial_pos_vis_obj = VisualMarker(visual_shape=p.GEOM_CYLINDER,
-                                                rgba_color=[1, 0, 0, 0.3],
-                                                radius=self.dist_tol,
+                                                rgba_color=[1, 0, 0, 1],
+                                                radius=0.5,
                                                 length=cyl_length,
                                                 initial_offset=[0, 0, cyl_length / 2.0])
         self.target_pos_vis_obj = VisualMarker(visual_shape=p.GEOM_CYLINDER,
-                                               rgba_color=[0, 0, 1, 0.3],
-                                               radius=self.dist_tol,
+                                               rgba_color=[0, 0, 1, 1],
+                                               radius=0.5,
                                                length=cyl_length,
                                                initial_offset=[0, 0, cyl_length / 2.0])
         self.initial_pos_vis_obj.load()
@@ -206,6 +206,34 @@ class NavigateEnv(BaseEnv):
                                   for _ in range(self.num_waypoints_vis)]
             for waypoint in self.waypoints_vis:
                 waypoint.load()
+        '''
+
+        # add visual objects
+        self.visual_object_at_initial_target_pos = self.config.get(
+            'visual_object_at_initial_target_pos', False)
+
+        if self.visual_object_at_initial_target_pos:
+            self.initial_pos_vis_obj = VisualMarker(visual_shape=p.GEOM_CYLINDER,
+                                                    rgba_color=[1, 0, 0, 0.95],
+                                                    radius=0.02,
+                                                    length=5)
+            self.target_pos_vis_obj = VisualMarker(visual_shape=p.GEOM_CYLINDER,
+                                                   rgba_color=[1, 0, 0, 0.95],
+                                                   radius=0.02,
+                                                   length=5)
+            self.target_pos_vis_obj_exact = VisualMarker(visual_shape=p.GEOM_SPHERE,
+                                                   rgba_color=[0, 0, 1, 0.95],
+                                                   radius=0.04)
+
+            self.initial_pos_vis_obj.load()
+
+            if self.config.get('target_visual_object_visible_to_agent', False):
+                self.simulator.import_object(self.target_pos_vis_obj)
+                self.simulator.import_object(self.target_pos_vis_obj_exact)
+            else:
+                self.target_pos_vis_obj.load()
+                self.target_pos_vis_obj_exact.load()
+
 
     def load_miscellaneous_variables(self):
         """
@@ -533,6 +561,7 @@ class NavigateEnv(BaseEnv):
 
         self.initial_pos_vis_obj.set_position(self.initial_pos)
         self.target_pos_vis_obj.set_position(self.target_pos)
+        self.target_pos_vis_obj_exact.set_position(self.target_pos)
 
         if self.scene.build_graph:
             shortest_path, _ = self.get_shortest_path(entire_path=True)
@@ -716,7 +745,7 @@ class NavigateRandomEnv(NavigateEnv):
             action_timestep=1 / 10.0,
             physics_timestep=1 / 240.0,
             automatic_reset=False,
-            random_height=False,
+            random_height=True,
             device_idx=0,
             render_to_tensor=False
     ):
@@ -739,6 +768,7 @@ class NavigateRandomEnv(NavigateEnv):
                                                 device_idx=device_idx,
                                                 render_to_tensor=render_to_tensor)
         self.random_height = random_height
+        print(self.random_height)
 
         self.target_dist_min = self.config.get('target_dist_min', 1.0)
         self.target_dist_max = self.config.get('target_dist_max', 10.0)
