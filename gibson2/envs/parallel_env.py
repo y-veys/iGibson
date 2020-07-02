@@ -374,9 +374,9 @@ if __name__ == "__main__":
     config_filename = os.path.join(os.path.dirname(gibson2.__file__), '../test/test.yaml')
 
     def load_env():
-        return NavigateEnv(config_file=config_filename, mode='gui')
+        return NavigateEnv(config_file=config_filename, mode='headless')
 
-    parallel_env = ParallelNavEnvironment([load_env] * 2, blocking=False)
+    parallel_env = ParallelNavEnvironment([load_env], blocking=False)
     #from IPython import embed; embed()
     #parallel_env.close()
 
