@@ -19,7 +19,7 @@ target_pos: [1.0, 1.0, 1.2]
 target_orn: [0.0, 0.0, 0.0]
 
 is_discrete: false
-additional_states_dim: 40
+additional_states_dim: 38
 
 # reward
 reward_type: l2

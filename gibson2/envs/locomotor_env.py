@@ -267,13 +267,14 @@ class NavigateEnv(BaseEnv):
         """
         :return: non-perception observation, such as goal location
         """
-        additional_states = self.global_to_local(self.target_pos)[:2]
-        if self.goal_format == 'polar':
-            additional_states = np.array(cartesian_to_polar(additional_states[0], additional_states[1]))
+        #additional_states = self.global_to_local(self.target_pos)[:2]
+        #if self.goal_format == 'polar':
+        #    additional_states = np.array(cartesian_to_polar(additional_states[0], additional_states[1]))
 
         #print(self.goal_format)
         #print(additional_states)
 
+        additional_states = []
         # linear velocity along the x-axis
         linear_velocity = rotate_vector_3d(self.robots[0].get_linear_velocity(),
                                            *self.robots[0].get_rpy())[0]
