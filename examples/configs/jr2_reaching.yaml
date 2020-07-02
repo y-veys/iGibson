@@ -42,8 +42,6 @@ max_step: 500
 # sensor
 output: [sensor, rgb, depth]
 resolution: 128
-image_width: 320
-image_height: 240
 fov: 1.57
 
 # display
