@@ -5,7 +5,7 @@ scene: stadium
 
 # robot
 robot: JR2_Kinova
-wheel_velocity: 0.08
+wheel_velocity: 0.25
 arm_velocity: 0.25
 
 # task, observation and action
