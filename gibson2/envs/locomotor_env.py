@@ -286,7 +286,10 @@ class NavigateEnv(BaseEnv):
         if self.config['task'] == 'reaching':
             end_effector_pos_local = self.global_to_local(self.robots[0].get_end_effector_position())
             additional_states = np.append(additional_states, end_effector_pos_local)
-            additional_states = np.append(additional_states, self.robots[0].calc_state())
+            self.robots[0].calc_state()
+            additional_states = np.append(additional_states, self.robots[0].joint_position)
+            additional_states = np.append(additional_states, self.robots[0].joint_velocity)
+            additional_states = np.append(additional_states, self.robots[0].joint_torque)
 
         assert additional_states.shape[0] == self.additional_states_dim, \
             'additional states dimension mismatch {} v.s. {}'.format(additional_states.shape[0], self.additional_states_dim)
@@ -783,7 +786,6 @@ class NavigateRandomEnv(NavigateEnv):
                                                 device_idx=device_idx,
                                                 render_to_tensor=render_to_tensor)
         self.random_height = random_height
-        print(self.random_height)
 
         self.target_dist_min = self.config.get('target_dist_min', 1.0)
         self.target_dist_max = self.config.get('target_dist_max', 10.0)
@@ -825,6 +827,66 @@ class NavigateRandomEnv(NavigateEnv):
         state = super(NavigateRandomEnv, self).reset()
         return state
 
+class NavigateRandomHeightEnv(NavigateEnv):
+    def __init__(
+            self,
+            config_file,
+            model_id=None,
+            mode='headless',
+            action_timestep=1 / 10.0,
+            physics_timestep=1 / 240.0,
+            automatic_reset=False,
+            random_height=True,
+            device_idx=0,
+            render_to_tensor=False
+    ):
+        """
+        :param config_file: config_file path
+        :param model_id: override model_id in config file
+        :param mode: headless or gui mode
+        :param action_timestep: environment executes action per action_timestep second
+        :param physics_timestep: physics timestep for pybullet
+        :param automatic_reset: whether to automatic reset after an episode finishes
+        :param random_height: whether to randomize height for target position (for reaching task)
+        :param device_idx: device_idx: which GPU to run the simulation and rendering on
+        """
+        super(NavigateRandomHeightEnv, self).__init__(config_file,
+                                                model_id=model_id,
+                                                mode=mode,
+                                                action_timestep=action_timestep,
+                                                physics_timestep=physics_timestep,
+                                                automatic_reset=automatic_reset,
+                                                device_idx=device_idx,
+                                                render_to_tensor=render_to_tensor)
+
+    def reset_initial_and_target_pos(self):
+        """
+        Reset initial_pos, initial_orn and target_pos through randomization
+        The geodesic distance (or L2 distance if traversable map graph is not built)
+        between initial_pos and target_pos has to be between [self.target_dist_min, self.target_dist_max]
+        """
+        self.initial_pos = np.array(self.config.get('initial_pos', [0, 0, 0]))
+        self.initial_orn = np.array(self.config.get('initial_orn', [0, 0, 0]))
+        self.target_pos = np.array(self.config.get('target_pos', [5, 5, 0]))
+        self.target_orn = np.array(self.config.get('target_orn', [0, 0, 0]))
+
+        self.target_pos[2] = np.random.uniform(0.4, 1.2)
+
+    def reset(self):
+        """
+        Reset episode
+        """
+        self.floor_num = self.scene.get_random_floor()
+
+        if self.scene.is_interactive:
+            # reset scene objects
+            self.scene.reset_scene_objects()
+        else:
+            # reset "virtual floor" to the correct height
+            self.scene.reset_floor(floor=self.floor_num, additional_elevation=0.02)
+
+        state = super(NavigateRandomHeightEnv, self).reset()
+        return state
 
 class NavigateRandomEnvSim2Real(NavigateRandomEnv):
     def __init__(self,
