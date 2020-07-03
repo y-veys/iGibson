@@ -271,9 +271,6 @@ class NavigateEnv(BaseEnv):
         if self.goal_format == 'polar':
             additional_states = np.array(cartesian_to_polar(additional_states[0], additional_states[1]))
 
-        #print(self.goal_format)
-        #print(additional_states)
-
         #additional_states = []
         # linear velocity along the x-axis
         linear_velocity = rotate_vector_3d(self.robots[0].get_linear_velocity(),
@@ -284,8 +281,14 @@ class NavigateEnv(BaseEnv):
         additional_states = np.append(additional_states, [linear_velocity, angular_velocity])
 
         if self.config['task'] == 'reaching':
+            # End-effector
             end_effector_pos_local = self.global_to_local(self.robots[0].get_end_effector_position())
             additional_states = np.append(additional_states, end_effector_pos_local)
+
+            # Height
+            additional_states = np.append(additional_states, self.target_pos[2:])
+
+            # Joint positions and velocities 
             self.robots[0].calc_state()
             additional_states = np.append(additional_states, self.robots[0].joint_position)
             additional_states = np.append(additional_states, self.robots[0].joint_velocity)
@@ -294,8 +297,6 @@ class NavigateEnv(BaseEnv):
         assert additional_states.shape[0] == self.additional_states_dim, \
             'additional states dimension mismatch {} v.s. {}'.format(additional_states.shape[0], self.additional_states_dim)
 
-        #print(self.goal_format)
-        #print("Additional States: {}".format(additional_states))
         return additional_states
 
     def add_naive_noise_to_sensor(self, sensor_reading, noise_rate, noise_value=1.0):
