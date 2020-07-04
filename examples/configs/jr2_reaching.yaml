@@ -5,8 +5,8 @@ scene: stadium
 
 # robot
 robot: JR2_Kinova
-wheel_velocity: 0.10
-arm_velocity: 1.00
+wheel_velocity: 1.0
+arm_velocity: 1.0
 
 # task, observation and action
 task: reaching # pointgoal|objectgoal|areagoal|reaching
