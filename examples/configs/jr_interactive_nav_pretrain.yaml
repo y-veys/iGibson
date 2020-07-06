@@ -9,7 +9,7 @@ wheel_velocity: 0.025
 arm_velocity: 0.005
 
 # task, observation and action
-task: pointgoal # pointgoal|objectgoal|areagoal|reaching
+task: reaching # pointgoal|objectgoal|areagoal|reaching
 fisheye: false
 door_angle: 90
 
@@ -20,7 +20,7 @@ target_pos: [0, 5, 0.0]
 target_orn: [0.0, 0.0, 0.0]
 
 is_discrete: false
-additional_states_dim: 3
+additional_states_dim: 29
 auxiliary_sensor_dim: 66
 
 normalize_observation: true
@@ -70,7 +70,7 @@ observation_normalizer: {'sensor':[[-3.0, -3.0, 0.0],                           
 }
 
 # reward
-reward_type: dense
+reward_type: l2
 success_reward: 500.0
 slack_reward: -0.01
 potential_reward_weight: 2.0
@@ -87,10 +87,9 @@ dist_tol: 0.5
 max_step: 256
 
 # sensor
-output: [sensor, auxiliary_sensor, depth]
-resolution: 64
-fov: 150
-n_rays_per_horizontal: 128
+output: [sensor, rgb, depth]
+resolution: 256
+fov: 1.57
 
 # display
 use_filler: true
@@ -116,7 +115,7 @@ fast_lq_render: true
 
 # visual objects
 visual_object_at_initial_target_pos: true
-target_visual_object_visible_to_agent: false
+target_visual_object_visible_to_agent: true
 
 # debug
 debug: false
