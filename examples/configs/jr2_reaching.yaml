@@ -5,7 +5,7 @@ scene: stadium
 
 # robot
 robot: JR2_Kinova
-wheel_velocity: 0.50
+wheel_velocity: 0.25
 arm_velocity: 0.50
 
 # task, observation and action
@@ -23,21 +23,21 @@ additional_states_dim: 29
 
 # reward
 reward_type: l2
-success_reward: 100.0
+success_reward: 200.0
 slack_reward: -0.01
 potential_reward_weight: 2.0
 #electricity_reward_weight: -0.02
 #stall_torque_reward_weight: -0.0001
-electricity_reward_weight: -0.001
+electricity_reward_weight: -0.002
 stall_torque_reward_weight: 0.0
-collision_reward_weight: -0.01
+collision_reward_weight: -1.0
 
 # discount factor
 discount_factor: 0.99
 
 # termination condition
-dist_tol: 0.1
-max_step: 500
+dist_tol: 0.2
+max_step: 1000
 
 # sensor
 output: [sensor, rgb, depth]
@@ -68,7 +68,7 @@ fast_lq_render: true
 
 # visual objects
 visual_object_at_initial_target_pos: true
-target_visual_object_visible_to_agent: true
+target_visual_object_visible_to_agent: false
 
 # debug
 debug: false
