@@ -183,7 +183,8 @@ class LocomotorRobot(BaseRobot):
         self.apply_robot_action(real_action)
 
     def calc_state(self):
-        j = np.array([j.get_joint_relative_state() for j in self.ordered_joints]).astype(np.float32).flatten()
+        j = np.array([j.get_state() for j in self.ordered_joints]).astype(np.float32).flatten()
+
         self.joint_position = j[0::3]
         self.joint_velocity = j[1::3]
         self.joint_torque = j[2::3]

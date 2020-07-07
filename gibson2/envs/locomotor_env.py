@@ -278,6 +278,7 @@ class NavigateEnv(BaseEnv):
         # angular velocity along the z-axis
         angular_velocity = rotate_vector_3d(self.robots[0].get_angular_velocity(),
                                             *self.robots[0].get_rpy())[2]
+
         additional_states = np.append(additional_states, [linear_velocity, angular_velocity])
 
         if self.config['task'] == 'reaching':
@@ -288,9 +289,13 @@ class NavigateEnv(BaseEnv):
             # Height
             additional_states = np.append(additional_states, self.target_pos[2:])
 
+            # L2 distance between end-effector and goal
+            additional_states = np.append(additional_states, self.get_l2_potential())
+
             # Joint positions and velocities 
             self.robots[0].calc_state()
-            additional_states = np.append(additional_states, self.robots[0].joint_position)
+            additional_states = np.append(additional_states, np.sin(self.robots[0].joint_position))[2:]
+            additional_states = np.append(additional_states, np.cos(self.robots[0].joint_position))[2:]
             additional_states = np.append(additional_states, self.robots[0].joint_velocity)
             additional_states = np.append(additional_states, self.robots[0].joint_torque)
 
