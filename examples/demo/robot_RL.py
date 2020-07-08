@@ -23,7 +23,7 @@ def main():
     #scene.load()
 
     robots = []
-    config = parse_config('../configs/jr_p2p_nav.yaml')
+    config = parse_config('../configs/jr2_reaching.yaml')
     jr = JR2_Kinova(config)
     robots.append(jr)
 
@@ -54,8 +54,7 @@ def main():
         for robot, position in zip(robots, positions):
             action_arm = np.random.uniform(-1, 1, robot.arm_dim)
             action = np.concatenate([action_base, action_arm])
-            print(action)
-            robot.apply_action(action)
+            robot.apply_action([1,1,1,1,1,1,1])
         p.stepSimulation()
         time.sleep(1./240.0)
 

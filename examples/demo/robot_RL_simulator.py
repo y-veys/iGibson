@@ -10,7 +10,7 @@ from gibson2.core.render.profiler import Profiler
 
 def main():  
 
-    config = parse_config('../configs/jr2.yaml')   
+    config = parse_config('../configs/jr2_reaching.yaml')   
     s = Simulator(mode='gui', image_width=512, image_height=512)
     
     scene = StadiumScene()
@@ -26,7 +26,7 @@ def main():
     for i in range(10000):
         with Profiler('Simulator step'):
 
-            #jr.apply_action([0,0,0,0,0,0,0])
+            jr.apply_action([0,0,0,0,0,0,0])
             s.step()
             rgb = s.renderer.render_robot_cameras(modes=('rgb'))
 

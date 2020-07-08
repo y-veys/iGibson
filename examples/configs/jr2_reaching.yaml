@@ -5,7 +5,7 @@ scene: stadium
 
 # robot
 robot: JR2_Kinova
-wheel_velocity: 0.25
+wheel_velocity: 0.025
 arm_velocity: 0.50
 
 # task, observation and action
@@ -19,7 +19,7 @@ target_pos: [1.0, 1.0, 1.2]
 target_orn: [0.0, 0.0, 0.0]
 
 is_discrete: false
-additional_states_dim: 30
+additional_states_dim: 33
 
 # reward
 reward_type: l2
