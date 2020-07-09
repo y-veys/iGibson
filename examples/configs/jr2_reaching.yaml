@@ -31,16 +31,17 @@ potential_reward_weight: 2.0
 electricity_reward_weight: -0.002
 stall_torque_reward_weight: 0.0
 collision_reward_weight: -0.1
+collision_ignore_link_a_ids: [2, 3, 5, 7]
 
 # discount factor
 discount_factor: 0.99
 
 # termination condition
 dist_tol: 0.2
-max_step: 1000
+max_step: 100
 
 # sensor
-output: [sensor, rgb, depth]
+output: [sensor]
 resolution: 256
 fov: 1.57
 

@@ -12,12 +12,13 @@ import logging
 def main():
     config_filename = os.path.join(os.path.dirname(gibson2.__file__),
                                    '../examples/configs/jr2_reaching.yaml')
-    nav_env = NavigateRandomHeightEnv(config_file=config_filename, mode='gui',random_height=True)
+    nav_env = NavigateRandomHeightEnv(config_file=config_filename, mode='pbgui',random_height=True)
     for j in range(10):
         nav_env.reset()
         for i in range(100):
             with Profiler('Environment action step'):
                 action = nav_env.action_space.sample()
+                action = [0,0,1,1,1,1,1]
                 state, reward, done, info = nav_env.step(action)
                 if done:
                     logging.info("Episode finished after {} timesteps".format(i + 1))

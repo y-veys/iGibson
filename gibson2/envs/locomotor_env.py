@@ -178,7 +178,7 @@ class NavigateEnv(BaseEnv):
         """
         Load visualization, such as initial and target position, shortest path, etc
         """
-        if self.mode != 'gui':
+        if (self.mode != 'gui' and self.mode != 'iggui' and self.mode != 'pbgui'):
             return
         
         '''
@@ -213,19 +213,19 @@ class NavigateEnv(BaseEnv):
             'visual_object_at_initial_target_pos', False)
 
         if self.visual_object_at_initial_target_pos:
-            self.initial_pos_vis_obj = VisualMarker(visual_shape=p.GEOM_CYLINDER,
-                                                    rgba_color=[1, 0, 0, 0.95],
-                                                    radius=0.02,
-                                                    length=5)
+            #self.initial_pos_vis_obj = VisualMarker(visual_shape=p.GEOM_CYLINDER,
+            #                                        rgba_color=[1, 0, 0, 0.95],
+            #                                        radius=0.02,
+            #                                        length=5)
             self.target_pos_vis_obj = VisualMarker(visual_shape=p.GEOM_CYLINDER,
-                                                   rgba_color=[1, 0, 0, 0.95],
+                                                   rgba_color=[1, 1, 0, 0.7],
                                                    radius=0.02,
                                                    length=5)
             self.target_pos_vis_obj_exact = VisualMarker(visual_shape=p.GEOM_SPHERE,
-                                                   rgba_color=[0, 0, 1, 0.95],
-                                                   radius=0.04)
+                                                   rgba_color=[1, 0, 0, 1],
+                                                   radius=0.05)
 
-            self.initial_pos_vis_obj.load()
+            #self.initial_pos_vis_obj.load()
 
             if self.config.get('target_visual_object_visible_to_agent', False):
                 self.simulator.import_object(self.target_pos_vis_obj)
@@ -438,6 +438,7 @@ class NavigateEnv(BaseEnv):
             collision_links.append(list(p.getContactPoints(bodyA=self.robots[0].robot_ids[0])))
         self.simulator.sync()
 
+
         return self.filter_collision_links(collision_links)
 
     def filter_collision_links(self, collision_links):
@@ -580,10 +581,10 @@ class NavigateEnv(BaseEnv):
         self.path_length += l2_distance(old_robot_position, new_robot_position)
 
     def step_visualization(self):
-        if self.mode != 'gui':
+        if (self.mode != 'gui' and self.mode != 'iggui' and self.mode != 'pbgui'):
             return
 
-        self.initial_pos_vis_obj.set_position(self.initial_pos)
+        #self.initial_pos_vis_obj.set_position(self.initial_pos)
         self.target_pos_vis_obj.set_position(self.target_pos)
         self.target_pos_vis_obj_exact.set_position(self.target_pos)
 
