@@ -287,17 +287,17 @@ class NavigateEnv(BaseEnv):
             additional_states = np.append(additional_states, end_effector_pos_local)
 
             # Height
-            #additional_states = np.append(additional_states, self.target_pos[2:])
+            additional_states = np.append(additional_states, self.target_pos[2:])
 
             # L2 distance between end-effector and goal
-            #additional_states = np.append(additional_states, self.get_l2_potential())
+            additional_states = np.append(additional_states, self.get_l2_potential())
 
             # Joint positions and velocities 
-            #self.robots[0].calc_state()
-            #dditional_states = np.append(additional_states, np.sin(self.robots[0].joint_position))[2:]
-            #additional_states = np.append(additional_states, np.cos(self.robots[0].joint_position))[2:]
-            #additional_states = np.append(additional_states, self.robots[0].joint_velocity)
-            #additional_states = np.append(additional_states, self.robots[0].joint_torque)
+            self.robots[0].calc_state()
+            dditional_states = np.append(additional_states, np.sin(self.robots[0].joint_position))[2:]
+            additional_states = np.append(additional_states, np.cos(self.robots[0].joint_position))[2:]
+            additional_states = np.append(additional_states, self.robots[0].joint_velocity)
+            additional_states = np.append(additional_states, self.robots[0].joint_torque)
 
         assert additional_states.shape[0] == self.additional_states_dim, \
             'additional states dimension mismatch {} v.s. {}'.format(additional_states.shape[0], self.additional_states_dim)
@@ -530,6 +530,8 @@ class NavigateEnv(BaseEnv):
 
         if self.is_goal_reached():
             reward += self.success_reward  # |success_reward| = 10.0 per step
+            #print("SUCCESS")
+            #print(self.get_l2_potential())
         return reward, info
 
     def get_termination(self, collision_links=[], action=None, info={}):
