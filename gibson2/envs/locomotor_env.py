@@ -234,6 +234,30 @@ class NavigateEnv(BaseEnv):
                 self.target_pos_vis_obj.load()
                 self.target_pos_vis_obj_exact.load()
 
+    def load_obstacles(self):
+
+        obstacle_1 = BoxShape(pos=[1, -2, 3], 
+                            dim=[0.75, 0.75, 1], 
+                            visual_only=False, 
+                            mass=1000, 
+                            color=[1, 1, 1, 0.95])
+
+        obstacle_2 = BoxShape(pos=[2, 4, 3], 
+                            dim=[1, 0.75, 1], 
+                            visual_only=False, 
+                            mass=1000, 
+                            color=[1, 1, 1, 0.95])
+
+        obstacle_3 = BoxShape(pos=[-1, 2, 3], 
+                            dim=[0.75, 1, 1], 
+                            visual_only=False, 
+                            mass=1000, 
+                            color=[1, 1, 1, 0.95])
+
+        self.simulator.import_object(obstacle_1)
+        self.simulator.import_object(obstacle_2)
+        self.simulator.import_object(obstacle_3)
+
 
     def load_miscellaneous_variables(self):
         """
@@ -253,6 +277,7 @@ class NavigateEnv(BaseEnv):
         self.load_observation_space()
         self.load_action_space()
         self.load_visualization()
+        #self.load_obstacles()
         self.load_miscellaneous_variables()
 
     def global_to_local(self, pos):
@@ -287,16 +312,16 @@ class NavigateEnv(BaseEnv):
             additional_states = np.append(additional_states, end_effector_pos_local)
 
             # Height
-            additional_states = np.append(additional_states, self.target_pos[2:])
+            #additional_states = np.append(additional_states, self.target_pos[2:])
 
             # L2 distance between end-effector and goal
-            additional_states = np.append(additional_states, self.get_l2_potential())
+            #additional_states = np.append(additional_states, self.get_l2_potential())
 
             # Joint positions and velocities 
-            #self.robots[0].calc_state()
-            #additional_states = np.append(additional_states, np.sin(self.robots[0].joint_position))[2:]
-            #additional_states = np.append(additional_states, np.cos(self.robots[0].joint_position))[2:]
-            #additional_states = np.append(additional_states, self.robots[0].joint_velocity)
+            self.robots[0].calc_state()
+            #additional_states = np.append(additional_states, np.sin(self.robots[0].joint_position[2:]))
+            #additional_states = np.append(additional_states, np.cos(self.robots[0].joint_position[2:]))
+            additional_states = np.append(additional_states, self.robots[0].joint_velocity[2:])
             #additional_states = np.append(additional_states, self.robots[0].joint_torque)
 
         assert additional_states.shape[0] == self.additional_states_dim, \
@@ -1056,11 +1081,11 @@ if __name__ == '__main__':
     parser.add_argument('--mode',
                         '-m',
                         choices=['headless', 'gui'],
-                        default='headless',
+                        default='pbgui',
                         help='which mode for simulation (default: headless)')
     parser.add_argument('--env_type',
                         choices=['deterministic', 'random', 'sim2real'],
-                        default='deterministic',
+                        default='random',
                         help='which environment type (deterministic | random | sim2real)')
     parser.add_argument('--sim2real_track',
                         choices=['static', 'interactive', 'dynamic'],
