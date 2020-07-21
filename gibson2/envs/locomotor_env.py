@@ -319,9 +319,9 @@ class NavigateEnv(BaseEnv):
 
             # Joint positions and velocities 
             self.robots[0].calc_state()
-            additional_states = np.append(additional_states, np.sin(self.robots[0].joint_position[2:]))
-            additional_states = np.append(additional_states, np.cos(self.robots[0].joint_position[2:]))
-            additional_states = np.append(additional_states, self.robots[0].joint_velocity[2:])
+            additional_states = np.append(additional_states, np.sin(self.robots[0].joint_position))
+            additional_states = np.append(additional_states, np.cos(self.robots[0].joint_position))
+            additional_states = np.append(additional_states, self.robots[0].joint_velocity)
             additional_states = np.append(additional_states, self.robots[0].joint_torque)
 
         assert additional_states.shape[0] == self.additional_states_dim, \
