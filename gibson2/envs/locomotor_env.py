@@ -322,7 +322,7 @@ class NavigateEnv(BaseEnv):
             additional_states = np.append(additional_states, np.sin(self.robots[0].joint_position[2:]))
             additional_states = np.append(additional_states, np.cos(self.robots[0].joint_position[2:]))
             additional_states = np.append(additional_states, self.robots[0].joint_velocity[2:])
-            #additional_states = np.append(additional_states, self.robots[0].joint_torque)
+            additional_states = np.append(additional_states, self.robots[0].joint_torque)
 
         assert additional_states.shape[0] == self.additional_states_dim, \
             'additional states dimension mismatch {} v.s. {}'.format(additional_states.shape[0], self.additional_states_dim)
