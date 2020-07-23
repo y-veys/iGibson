@@ -632,9 +632,9 @@ class JR2_Kinova(LocomotorRobot):
     # initialize JR's arm to almost the same height as the door handle to ease exploration
     def robot_specific_reset(self):
         super(JR2_Kinova, self).robot_specific_reset()
-        self.ordered_joints[2].reset_joint_state(-np.pi / 2.0, 0.0)
-        self.ordered_joints[3].reset_joint_state(np.pi / 2.0, 0.0)
-        self.ordered_joints[4].reset_joint_state(np.pi / 2.0, 0.0)
+        self.ordered_joints[2].reset_joint_state(np.random.uniform(-3.0*np.pi/4.0, -np.pi/2.0), 0.0)
+        self.ordered_joints[3].reset_joint_state(np.random.uniform(np.pi/4.0, 3.0*np.pi/4.0), 0.0)
+        self.ordered_joints[4].reset_joint_state(np.random.uniform(np.pi/4.0, 3.0*np.pi/4.0), 0.0)
         self.ordered_joints[5].reset_joint_state(np.pi / 2.0, 0.0)
         self.ordered_joints[6].reset_joint_state(0.0, 0.0)
 

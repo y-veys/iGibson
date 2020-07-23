@@ -15,27 +15,27 @@ def main():
     p.loadMJCF(floor)
 
     robots = []
-    config = parse_config('../configs/fetch_p2p_nav.yaml')
-    fetch = Fetch(config)
-    robots.append(fetch)
+    #config = parse_config('../configs/fetch_p2p_nav.yaml')
+    #fetch = Fetch(config)
+    #robots.append(fetch)
 
     config = parse_config('../configs/jr_p2p_nav.yaml')
     jr = JR2_Kinova(config)
     robots.append(jr)
 
-    config = parse_config('../configs/locobot_p2p_nav.yaml')
-    locobot = Locobot(config)
-    robots.append(locobot)
+    #config = parse_config('../configs/locobot_p2p_nav.yaml')
+    #locobot = Locobot(config)
+    #robots.append(locobot)
 
-    config = parse_config('../configs/turtlebot_p2p_nav.yaml')
-    turtlebot = Turtlebot(config)
-    robots.append(turtlebot)
+    #config = parse_config('../configs/turtlebot_p2p_nav.yaml')
+    #turtlebot = Turtlebot(config)
+    #robots.append(turtlebot)
 
     positions = [
-        [0, 0, 0],
-        [1, 0, 0],
-        [0, 1, 0],
-        [1, 1, 0]
+        [0, 0, 0]
+        #[1, 0, 0],
+        #[0, 1, 0],
+        #[1, 1, 0]
     ]
 
     for robot, position in zip(robots, positions):
@@ -44,6 +44,7 @@ def main():
         robot.robot_specific_reset()
         robot.keep_still()
 
+
     for _ in range(2400):  # keep still for 10 seconds
         p.stepSimulation()
         time.sleep(1./240.)
@@ -51,9 +52,11 @@ def main():
     for _ in range(2400):  # move with small random actions for 10 seconds
         for robot, position in zip(robots, positions):
             action = np.random.uniform(-1, 1, robot.action_dim)
-            robot.apply_action(action)
+            #robot.apply_action(action)
+            robot.apply_action([0,0,0,0,0,0,0])
         p.stepSimulation()
         time.sleep(1./240.0)
+
 
     p.disconnect()
 
