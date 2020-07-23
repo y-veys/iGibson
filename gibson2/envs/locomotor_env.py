@@ -292,9 +292,10 @@ class NavigateEnv(BaseEnv):
         """
         :return: non-perception observation, such as goal location
         """
-        additional_states = self.global_to_local(self.target_pos)[:2]
-        if self.goal_format == 'polar':
-            additional_states = np.array(cartesian_to_polar(additional_states[0], additional_states[1]))
+        additional_states = []
+        #additional_states = self.global_to_local(self.target_pos)[:2]
+        #if self.goal_format == 'polar':
+        #    additional_states = np.array(cartesian_to_polar(additional_states[0], additional_states[1]))
 
         #additional_states = []
         # linear velocity along the x-axis
@@ -312,7 +313,7 @@ class NavigateEnv(BaseEnv):
             additional_states = np.append(additional_states, end_effector_pos_local)
 
             # Height
-            additional_states = np.append(additional_states, self.target_pos[2:])
+            #additional_states = np.append(additional_states, self.target_pos[2:])
 
             # L2 distance between end-effector and goal
             #additional_states = np.append(additional_states, self.get_l2_potential())
