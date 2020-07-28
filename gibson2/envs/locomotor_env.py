@@ -234,6 +234,7 @@ class NavigateEnv(BaseEnv):
                 self.target_pos_vis_obj.load()
                 self.target_pos_vis_obj_exact.load()
 
+
     def load_obstacles(self):
 
         obstacle_1 = BoxShape(pos=[1, -2, 3], 
@@ -393,8 +394,14 @@ class NavigateEnv(BaseEnv):
         :return: semantic segmentation mask, normalized to [0.0, 1.0]
         """
         seg = self.simulator.renderer.render_robot_cameras(modes='seg')[0][:, :, 0:1]
-        if self.num_object_classes is not None:
-            seg = np.clip(seg * 255.0 / self.num_object_classes, 0.0, 1.0)
+        #if self.num_object_classes is not None:
+            #seg = np.clip(seg * 255.0 / self.num_object_classes, 0.0, 1.0)
+
+        seg = np.clip(seg * 255.0 / 3, 0.0, 1.0)
+
+        all_but_goal = seg < 1.0
+        seg[all_but_goal] = 0
+        
         return seg
 
     def get_scan(self):

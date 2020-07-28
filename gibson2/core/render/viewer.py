@@ -26,7 +26,9 @@ class Viewer:
 
         cv2.namedWindow('ExternalView')
         cv2.moveWindow("ExternalView", 0,0)
-        cv2.namedWindow('RobotView')
+        cv2.namedWindow('RGB')
+        cv2.namedWindow('SEG')
+        cv2.namedWindow('DEPTH')
         cv2.setMouseCallback('ExternalView', self.change_dir)
 
     def change_dir(self, event, x, y, flags, param):
@@ -116,10 +118,33 @@ class Viewer:
             exit()
 
         if not self.renderer is None:
-            frames = self.renderer.render_robot_cameras(modes=('rgb'))
-            if len(frames) > 0:
-                frame = cv2.cvtColor(np.concatenate(frames, axis=1), cv2.COLOR_RGB2BGR)
-                cv2.imshow('RobotView', frame)
+            #frames = self.renderer.render_robot_cameras(modes=('rgb','3d'))
+            #frames = -self.renderer.render_robot_cameras(modes=('3d'))[0][:, :, 2:3]
+            #if len(frames) > 0:
+                #frame = cv2.cvtColor(np.concatenate(frames, axis=1), cv2.COLOR_RGB2BGR)
+                #cv2.imshow('RobotView', frame)
+
+            rgb = self.renderer.render_robot_cameras(modes=('rgb'))
+
+            seg = self.renderer.render_robot_cameras(modes=('seg'))[0][:, :, 0:1]
+            seg = np.clip(seg * 255.0 / 3, 0.0, 1.0)
+
+            all_but_goal = seg < 1 
+            seg[all_but_goal] = 0
+
+            depth = self.renderer.render_robot_cameras(modes=('3d'))
+            #print(len(depth[0]))
+            depth = -self.renderer.render_robot_cameras(modes=('3d'))[0][:, :, 2:3]
+
+            depth[depth < 0.5] = 0.0
+            depth[depth > 5.0] = 0.0
+
+            # re-scale depth to [0.0, 1.0]
+            depth /= 5.0
+            
+            cv2.imshow('RGB', cv2.cvtColor(np.concatenate(rgb, axis=1), cv2.COLOR_RGB2BGR))
+            cv2.imshow('SEG', cv2.rotate(cv2.cvtColor(np.concatenate(seg, axis=1), cv2.COLOR_RGB2BGR), cv2.ROTATE_90_CLOCKWISE))
+            cv2.imshow('DEPTH', cv2.rotate(cv2.cvtColor(np.concatenate(depth, axis=1), cv2.COLOR_RGB2BGR),cv2.ROTATE_90_CLOCKWISE))
 
 
 if __name__ == '__main__':

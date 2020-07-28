@@ -1,4 +1,5 @@
 from gibson2.core.physics.robot_locomotors import Locobot, Turtlebot, JR2_Kinova, Fetch
+from gibson2.core.physics.scene import StadiumScene
 from gibson2.utils.utils import parse_config
 import os
 import time
@@ -11,8 +12,11 @@ def main():
     p.setGravity(0,0,-9.8)
     p.setTimeStep(1./240.)
 
-    floor = os.path.join(pybullet_data.getDataPath(), "mjcf/ground_plane.xml")
-    p.loadMJCF(floor)
+    #floor = os.path.join(pybullet_data.getDataPath(), "mjcf/ground_plane.xml")
+    #p.loadMJCF(floor)
+
+    scene = StadiumScene()
+    scene.load()
 
     robots = []
     #config = parse_config('../configs/fetch_p2p_nav.yaml')
