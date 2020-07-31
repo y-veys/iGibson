@@ -217,22 +217,22 @@ class NavigateEnv(BaseEnv):
             #                                        rgba_color=[1, 0, 0, 0.95],
             #                                        radius=0.02,
             #                                        length=5)
-            self.target_pos_vis_obj = VisualMarker(visual_shape=p.GEOM_CYLINDER,
-                                                   rgba_color=[1, 1, 0, 0.7],
-                                                   radius=0.02,
-                                                   length=5)
-            self.target_pos_vis_obj_exact = VisualMarker(visual_shape=p.GEOM_SPHERE,
+            #self.target_pos_vis_obj = VisualMarker(visual_shape=p.GEOM_CYLINDER,
+            #                                       rgba_color=[1, 1, 0, 0.7],
+            #                                       radius=0.02,
+            #                                       length=5)
+            self.target_pos_vis_obj = VisualMarker(visual_shape=p.GEOM_SPHERE,
                                                    rgba_color=[1, 0, 0, 1],
-                                                   radius=0.05)
+                                                   radius=self.dist_tol)
 
             #self.initial_pos_vis_obj.load()
 
             if self.config.get('target_visual_object_visible_to_agent', False):
                 self.simulator.import_object(self.target_pos_vis_obj)
-                self.simulator.import_object(self.target_pos_vis_obj_exact)
+                #self.simulator.import_object(self.target_pos_vis_obj_exact)
             else:
                 self.target_pos_vis_obj.load()
-                self.target_pos_vis_obj_exact.load()
+                #self.target_pos_vis_obj_exact.load()
 
 
     def load_obstacles(self):
@@ -397,7 +397,7 @@ class NavigateEnv(BaseEnv):
         #if self.num_object_classes is not None:
             #seg = np.clip(seg * 255.0 / self.num_object_classes, 0.0, 1.0)
 
-        seg = np.clip(seg * 255.0 / 3, 0.0, 1.0)
+        seg = np.clip(seg * 255.0 / 2, 0.0, 1.0)
 
         all_but_goal = seg < 1.0
         seg[all_but_goal] = 0
@@ -621,7 +621,7 @@ class NavigateEnv(BaseEnv):
 
         #self.initial_pos_vis_obj.set_position(self.initial_pos)
         self.target_pos_vis_obj.set_position(self.target_pos)
-        self.target_pos_vis_obj_exact.set_position(self.target_pos)
+        #self.target_pos_vis_obj_exact.set_position(self.target_pos)
 
         if self.scene.build_graph:
             shortest_path, _ = self.get_shortest_path(entire_path=True)
