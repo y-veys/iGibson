@@ -838,6 +838,7 @@ class NavigateRandomEnv(NavigateEnv):
         The geodesic distance (or L2 distance if traversable map graph is not built)
         between initial_pos and target_pos has to be between [self.target_dist_min, self.target_dist_max]
         """
+        '''
         _, self.initial_pos = self.scene.get_random_point_floor(self.floor_num, self.random_height)
         max_trials = 100
         dist = 0.0
@@ -852,6 +853,15 @@ class NavigateRandomEnv(NavigateEnv):
         if not (self.target_dist_min < dist < self.target_dist_max):
             print("WARNING: Failed to sample initial and target positions")
         self.initial_orn = np.array([0, 0, np.random.uniform(0, np.pi * 2)])
+        '''
+        self.initial_pos = np.array(self.config.get('initial_pos', [0, 0, 0]))
+        self.initial_orn = np.array(self.config.get('initial_orn', [0, 0, 0]))
+        self.target_pos = np.array(self.config.get('target_pos', [5, 5, 0]))
+        self.target_orn = np.array(self.config.get('target_orn', [0, 0, 0]))
+
+        self.target_pos[0] = np.random.uniform(1.0, 3.0)
+        self.target_pos[1] = np.random.uniform(-0.75, 0.75)
+        self.target_pos[2] = np.random.uniform(0.5, 1.0)
 
     def reset(self):
         """
