@@ -1,4 +1,5 @@
 from gibson2.core.physics.robot_locomotors import JR2_Kinova
+from gibson2.core.physics.robot_locomotors import JR2_Kinova_Head
 from gibson2.core.physics.interactive_objects import VisualMarker
 from gibson2.core.physics.scene import BuildingScene
 from gibson2.utils.utils import parse_config
@@ -24,10 +25,14 @@ def main():
 
     robots = []
     config = parse_config('../configs/jr2_reaching.yaml')
-    jr = JR2_Kinova(config)
-    robots.append(jr)
+    #jr = JR2_Kinova(config)
+    #robots.append(jr)
 
-    positions = [[0, 0, 0]]
+    jr_head = JR2_Kinova_Head(config)
+    robots.append(jr_head)
+
+
+    positions = [[0, 0, 0]]#, [0,2,0]]
 
     for robot, position in zip(robots, positions):
         robot.load()
@@ -54,7 +59,7 @@ def main():
         for robot, position in zip(robots, positions):
             action_arm = np.random.uniform(-1, 1, robot.arm_dim)
             action = np.concatenate([action_base, action_arm])
-            robot.apply_action([1,1,1,1,1,1,1])
+            robot.apply_action([0,0,0.2,0.2,0,0,0,0,0])
         p.stepSimulation()
         time.sleep(1./240.0)
 

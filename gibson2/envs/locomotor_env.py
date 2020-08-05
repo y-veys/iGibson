@@ -118,7 +118,7 @@ class NavigateEnv(BaseEnv):
             observation_space['rgb'] = self.rgb_space
         if 'depth' in self.output:
             self.depth_noise_rate = self.config.get('depth_noise_rate', 0.0)
-            self.depth_low = self.config.get('depth_low', 0.5)
+            self.depth_low = self.config.get('depth_low', 0.0)
             self.depth_high = self.config.get('depth_high', 5.0)
             self.depth_space = gym.spaces.Box(low=0.0,
                                               high=1.0,
@@ -356,7 +356,7 @@ class NavigateEnv(BaseEnv):
         depth = -self.simulator.renderer.render_robot_cameras(modes=('3d'))[0][:, :, 2:3]
         # 0.0 is a special value for invalid entries
         depth[depth < self.depth_low] = 0.0
-        depth[depth > self.depth_high] = 0.0
+        depth[depth > self.depth_high] = self.depth_high
 
         # re-scale depth to [0.0, 1.0]
         depth /= self.depth_high
@@ -399,8 +399,8 @@ class NavigateEnv(BaseEnv):
 
         seg = np.clip(seg * 255.0 / 2, 0.0, 1.0)
 
-        all_but_goal = seg < 1.0
-        seg[all_but_goal] = 0
+        #all_but_goal = seg < 1.0
+        #seg[all_but_goal] = 0
         
         return seg
 
@@ -616,6 +616,7 @@ class NavigateEnv(BaseEnv):
         self.path_length += l2_distance(old_robot_position, new_robot_position)
 
     def step_visualization(self):
+        
         if (self.mode != 'gui' and self.mode != 'iggui' and self.mode != 'pbgui'):
             return
 
@@ -623,6 +624,7 @@ class NavigateEnv(BaseEnv):
         self.target_pos_vis_obj.set_position(self.target_pos)
         #self.target_pos_vis_obj_exact.set_position(self.target_pos)
 
+        '''
         if self.scene.build_graph:
             shortest_path, _ = self.get_shortest_path(entire_path=True)
             floor_height = 0.0 if self.floor_num is None else self.scene.get_floor_height(self.floor_num)
@@ -633,6 +635,7 @@ class NavigateEnv(BaseEnv):
                                                                  floor_height]))
             for i in range(num_nodes, self.num_waypoints_vis):
                 self.waypoints_vis[i].set_position(pos=np.array([0.0, 0.0, 100.0]))
+        '''
 
     def step(self, action):
         """

@@ -129,15 +129,15 @@ class Viewer:
             seg = self.renderer.render_robot_cameras(modes=('seg'))[0][:, :, 0:1]
             seg = np.clip(seg * 255.0 / 2, 0.0, 1.0)
 
-            all_but_goal = seg < 1 
-            seg[all_but_goal] = 0
+            #all_but_goal = seg < 1 
+            #seg[all_but_goal] = 0
 
             depth = self.renderer.render_robot_cameras(modes=('3d'))
             #print(len(depth[0]))
             depth = -self.renderer.render_robot_cameras(modes=('3d'))[0][:, :, 2:3]
 
-            depth[depth < 0.5] = 0.0
-            depth[depth > 5.0] = 0.0
+            depth[depth < 0.0] = 0.0
+            depth[depth > 5.0] = 5.0
 
             # re-scale depth to [0.0, 1.0]
             depth /= 5.0

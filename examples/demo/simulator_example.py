@@ -1,4 +1,4 @@
-from gibson2.core.physics.robot_locomotors import Turtlebot
+from gibson2.core.physics.robot_locomotors import JR2_Kinova_Head
 from gibson2.core.simulator import Simulator
 from gibson2.core.physics.scene import BuildingScene
 from gibson2.core.physics.scene import StadiumScene
@@ -10,15 +10,16 @@ from gibson2.core.render.profiler import Profiler
 
 
 def main():
-    config = parse_config('../configs/turtlebot_demo.yaml')
+    config = parse_config('../configs/jr2_reaching.yaml')
     s = Simulator(mode='gui', image_width=512, image_height=512)
     #scene = BuildingScene('Rs',
     #                      build_graph=True,
     #                      pybullet_load_texture=True)
     scene = StadiumScene()
     s.import_scene(scene)
-    turtlebot = Turtlebot(config)
-    s.import_robot(turtlebot)
+    jr = JR2_Kinova_Head(config)
+    #turtlebot = Turtlebot(config)
+    s.import_robot(jr)
 
     for _ in range(10):
         obj = YCBObject('003_cracker_box')
@@ -27,7 +28,7 @@ def main():
 
     for i in range(10000):
         with Profiler('Simulator step'):
-            turtlebot.apply_action([0.1,0.1])
+            jr.apply_action([0,0,0.1,0.1,0,0,0,0,0])
             s.step()
             rgb = s.renderer.render_robot_cameras(modes=('rgb'))
 
