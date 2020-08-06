@@ -4,33 +4,29 @@ scene: stadium
 #model_id: Ohoopee
 
 # robot
-robot: JR2_Kinova
-wheel_velocity: 0.025
-arm_velocity: 0.50
+robot: JR2_Kinova_Head
+wheel_velocity: 0
+arm_velocity: 0
 
 # task, observation and action
-task: reaching # pointgoal|objectgoal|areagoal|reaching
+task: focus # pointgoal|objectgoal|areagoal|reaching
 fisheye: false
 
-initial_pos: [-1.0, -1.0, 0.0]
+initial_pos: [0.0, 0.0, 0.0]
 initial_orn: [0.0, 0.0, 0.0]
 
-target_pos: [1.0, 1.0, 1.2]
+target_pos: [1.5, 0.3, 1.2]
 target_orn: [0.0, 0.0, 0.0]
 
 is_discrete: false
-additional_states_dim: 26
+additional_states_dim: 20
 
 # reward
-reward_type: l2
-success_reward: 200.0
+reward_type: pixel
+success_reward: 10.0
 slack_reward: -0.01
-potential_reward_weight: 2.0
-#electricity_reward_weight: -0.02
-#stall_torque_reward_weight: -0.0001
-electricity_reward_weight: -0.002
-stall_torque_reward_weight: 0.0
-collision_reward_weight: -0.1
+potential_reward_weight: 30.0
+collision_reward_weight: 0.0
 collision_ignore_link_a_ids: [2, 3, 5, 7]
 
 # discount factor
@@ -41,7 +37,7 @@ dist_tol: 0.2
 max_step: 100
 
 # sensor
-output: [sensor]
+output: [seg]
 resolution: 256
 fov: 1.57
 

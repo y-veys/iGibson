@@ -78,7 +78,7 @@ class NavigateEnv(BaseEnv):
 
         # reward
         self.reward_type = self.config.get('reward_type', 'l2')
-        assert self.reward_type in ['geodesic', 'l2', 'sparse']
+        assert self.reward_type in ['geodesic', 'l2', 'sparse', 'pixel']
 
         self.success_reward = self.config.get('success_reward', 10.0)
         self.slack_reward = self.config.get('slack_reward', -0.01)
@@ -223,7 +223,7 @@ class NavigateEnv(BaseEnv):
             #                                       length=5)
             self.target_pos_vis_obj = VisualMarker(visual_shape=p.GEOM_SPHERE,
                                                    rgba_color=[1, 0, 0, 1],
-                                                   radius=self.dist_tol)
+                                                   radius=0.05)
 
             #self.initial_pos_vis_obj.load()
 
@@ -509,6 +509,15 @@ class NavigateEnv(BaseEnv):
             return self.robots[0].get_position()
         elif self.config['task'] == 'reaching':
             return self.robots[0].get_end_effector_position()
+        elif self.config['task'] == 'focus':
+            seg = self.get_seg()
+            (x_avg, y_avg) = (np.mean(np.where(seg==1)[0]), np.mean(np.where(seg==1)[1]))
+
+            if (not np.isnan(x_avg) and not np.isnan(y_avg)):
+                return [int(round(x_avg)), int(round(y_avg))]
+
+            else:
+                return [0,0]
 
     def get_shortest_path(self, from_initial_pos=False, entire_path=False):
         """
@@ -536,8 +545,17 @@ class NavigateEnv(BaseEnv):
         """
         return l2_distance(self.target_pos, self.get_position_of_interest())
 
+    def get_pixel_potential(self):
+        """
+        :return: L2 distance between middle of image and current 
+        """
+        return l2_distance([self.image_width/2, self.image_height/2], self.get_position_of_interest())
+
     def is_goal_reached(self):
-        return l2_distance(self.get_position_of_interest(), self.target_pos) < self.dist_tol
+        if self.reward_type == 'pixel':
+            return l2_distance([self.image_width/2, self.image_height/2], self.get_position_of_interest()) < self.dist_tol
+        else:
+            return l2_distance(self.get_position_of_interest(), self.target_pos) < self.dist_tol
 
     def get_reward(self, collision_links=[], action=None, info={}):
         """
@@ -553,6 +571,9 @@ class NavigateEnv(BaseEnv):
             new_potential = self.get_l2_potential()
         elif self.reward_type == 'geodesic':
             new_potential = self.get_geodesic_potential()
+        elif self.reward_type == 'pixel':
+            new_potential = self.get_pixel_potential()
+
         potential_reward = self.potential - new_potential
         reward += potential_reward * self.potential_reward_weight  # |potential_reward| ~= 0.1 per step
         self.potential = new_potential
@@ -793,6 +814,8 @@ class NavigateEnv(BaseEnv):
             self.potential = self.get_l2_potential()
         elif self.reward_type == 'geodesic':
             self.potential = self.get_geodesic_potential()
+        elif self.reward_type == 'pixel':
+            self.potential = self.get_pixel_potential()
         self.reset_variables()
         self.step_visualization()
 
