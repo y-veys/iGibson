@@ -400,9 +400,6 @@ class NavigateEnv(BaseEnv):
 
         seg = np.clip(seg * 255.0 / 2, 0.0, 1.0)
 
-        all_but_goal = seg < 1.0
-        seg[all_but_goal] = 0
-
         return seg
 
     def get_scan(self):
