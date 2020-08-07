@@ -4,7 +4,7 @@ scene: stadium
 #model_id: Ohoopee
 
 # robot
-robot: JR2_Kinova_Head
+robot: JR2_Kinova
 wheel_velocity: 0
 arm_velocity: 0
 
@@ -15,7 +15,7 @@ fisheye: false
 initial_pos: [0.0, 0.0, 0.0]
 initial_orn: [0.0, 0.0, 0.0]
 
-target_pos: [1.5, 0.3, 1.2]
+target_pos: [1.0, 0.0, 1.2]
 target_orn: [0.0, 0.0, 0.0]
 
 is_discrete: false
@@ -37,7 +37,7 @@ dist_tol: 0.2
 max_step: 100
 
 # sensor
-output: [seg]
+output: [rgb, depth, seg]
 resolution: 256
 fov: 1.57
 

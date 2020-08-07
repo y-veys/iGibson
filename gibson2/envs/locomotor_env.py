@@ -178,7 +178,7 @@ class NavigateEnv(BaseEnv):
         """
         Load visualization, such as initial and target position, shortest path, etc
         """
-        if (self.mode != 'gui' and self.mode != 'iggui' and self.mode != 'pbgui'):
+        if (self.mode != 'gui' and self.mode != 'iggui' and self.mode != 'pbgui' and self.mode !='headless'):
             return
         
         '''
@@ -375,6 +375,7 @@ class NavigateEnv(BaseEnv):
         """
         :return: RGB sensor reading, normalized to [0.0, 1.0]
         """
+
         return self.simulator.renderer.render_robot_cameras(modes=('rgb'))[0][:, :, :3]
 
     def get_pc(self):
@@ -395,13 +396,13 @@ class NavigateEnv(BaseEnv):
         """
         seg = self.simulator.renderer.render_robot_cameras(modes='seg')[0][:, :, 0:1]
         #if self.num_object_classes is not None:
-            #seg = np.clip(seg * 255.0 / self.num_object_classes, 0.0, 1.0)
+        #    seg = np.clip(seg * 255.0 / self.num_object_classes, 0.0, 1.0)
 
         seg = np.clip(seg * 255.0 / 2, 0.0, 1.0)
 
-        #all_but_goal = seg < 1.0
-        #seg[all_but_goal] = 0
-        
+        all_but_goal = seg < 1.0
+        seg[all_but_goal] = 0
+
         return seg
 
     def get_scan(self):
@@ -638,7 +639,7 @@ class NavigateEnv(BaseEnv):
 
     def step_visualization(self):
         
-        if (self.mode != 'gui' and self.mode != 'iggui' and self.mode != 'pbgui'):
+        if (self.mode != 'gui' and self.mode != 'iggui' and self.mode != 'pbgui' and self.mode != 'headless'):
             return
 
         #self.initial_pos_vis_obj.set_position(self.initial_pos)
