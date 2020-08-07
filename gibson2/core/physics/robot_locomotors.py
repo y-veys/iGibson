@@ -662,7 +662,7 @@ class JR2_Kinova_Head(LocomotorRobot):
         self.config = config
         self.wheel_velocity = config.get('wheel_velocity', 0.3)
         self.wheel_dim = 2
-        self.head_velocity = config.get('head_velocity', 1.0)
+        self.head_velocity = config.get('head_velocity', 0.2)
         self.head_dim = 2
         self.arm_velocity = config.get('arm_velocity', 1.0)
         self.arm_dim = 5
