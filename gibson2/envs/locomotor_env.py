@@ -86,6 +86,7 @@ class NavigateEnv(BaseEnv):
         # reward weight
         self.potential_reward_weight = self.config.get('potential_reward_weight', 1.0)
         self.collision_reward_weight = self.config.get('collision_reward_weight', -0.1)
+        self.focus_reward_weight = self.config.get('focus_reward_weight', 1.0)
 
         # ignore the agent's collision with these body ids
         self.collision_ignore_body_b_ids = set(self.config.get('collision_ignore_body_b_ids', []))
@@ -508,14 +509,18 @@ class NavigateEnv(BaseEnv):
         elif self.config['task'] == 'reaching':
             return self.robots[0].get_end_effector_position()
         elif self.config['task'] == 'focus':
-            seg = self.get_seg()
-            (x_avg, y_avg) = (np.mean(np.where(seg==1)[0]), np.mean(np.where(seg==1)[1]))
+            return self.get_goal_center()
+    
+    def get_goal_center(self):
+        seg = self.get_seg()
+        (x_avg, y_avg) = (np.mean(np.where(seg==1)[0]), np.mean(np.where(seg==1)[1]))
 
-            if (not np.isnan(x_avg) and not np.isnan(y_avg)):
-                return [int(round(x_avg)), int(round(y_avg))]
+        if (not np.isnan(x_avg) and not np.isnan(y_avg)):
+            return [int(round(x_avg)), int(round(y_avg))]
 
-            else:
-                return [0,0]
+        else:
+            return [0,0]
+
 
     def get_shortest_path(self, from_initial_pos=False, entire_path=False):
         """
@@ -547,7 +552,7 @@ class NavigateEnv(BaseEnv):
         """
         :return: L2 distance between middle of image and current 
         """
-        return l2_distance([self.image_width/2, self.image_height/2], self.get_position_of_interest())
+        return l2_distance([self.image_width/2, self.image_height/2], self.get_goal_center())
 
     def is_goal_reached(self):
         if self.reward_type == 'pixel':
@@ -566,7 +571,7 @@ class NavigateEnv(BaseEnv):
         reward = self.slack_reward  # |slack_reward| = 0.01 per step
 
         if self.reward_type == 'l2':
-            new_potential = self.get_l2_potential()
+            new_potential = self.get_l2_potential() 
         elif self.reward_type == 'geodesic':
             new_potential = self.get_geodesic_potential()
         elif self.reward_type == 'pixel':
@@ -579,6 +584,9 @@ class NavigateEnv(BaseEnv):
         collision_reward = float(len(collision_links_flatten) > 0)
         self.collision_step += int(collision_reward)
         reward += collision_reward * self.collision_reward_weight  # |collision_reward| ~= 1.0 per step if collision
+
+        focus_reward = self.focus_potential - self.get_pixel_potential()
+        reward += focus_reward * self.focus_reward_weight
 
         if self.is_goal_reached():
             reward += self.success_reward  # |success_reward| = 10.0 per step
@@ -810,6 +818,7 @@ class NavigateEnv(BaseEnv):
         state = self.get_state()
         if self.reward_type == 'l2':
             self.potential = self.get_l2_potential()
+            self.focus_potential = self.get_pixel_potential()
         elif self.reward_type == 'geodesic':
             self.potential = self.get_geodesic_potential()
         elif self.reward_type == 'pixel':
