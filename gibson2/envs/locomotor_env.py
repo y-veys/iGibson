@@ -585,8 +585,8 @@ class NavigateEnv(BaseEnv):
         self.collision_step += int(collision_reward)
         reward += collision_reward * self.collision_reward_weight  # |collision_reward| ~= 1.0 per step if collision
 
-        focus_reward = self.focus_potential - self.get_pixel_potential()
-        reward += focus_reward * self.focus_reward_weight
+        #focus_reward = self.focus_potential - self.get_pixel_potential()
+        #reward += focus_reward * self.focus_reward_weight
 
         if self.is_goal_reached():
             reward += self.success_reward  # |success_reward| = 10.0 per step
