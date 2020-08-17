@@ -111,6 +111,13 @@ class NavigateEnv(BaseEnv):
                                                shape=(self.sensor_dim,),
                                                dtype=np.float32)
             observation_space['sensor'] = self.sensor_space
+        if 'sensor_wo_goal' in self.output:
+            self.sensor_wo_goal_dim = self.additional_states_dim - 3 
+            self.sensor_wo_goal_space = gym.spaces.Box(low=-np.inf,
+                                                       high=np.inf,
+                                                       shape=(self.sensor_wo_goal_dim,),
+                                                       dtype=np.float32)
+            observation_space['sensor_wo_goal'] = self.sensor_wo_goal_space
         if 'rgb' in self.output:
             self.rgb_space = gym.spaces.Box(low=0.0,
                                             high=1.0,
@@ -295,9 +302,11 @@ class NavigateEnv(BaseEnv):
         :return: non-perception observation, such as goal location
         """
         additional_states = []
-        #additional_states = self.global_to_local(self.target_pos)[:2]
-        #if self.goal_format == 'polar':
-        #    additional_states = np.array(cartesian_to_polar(additional_states[0], additional_states[1]))
+        additional_states = self.global_to_local(self.target_pos)[:2]
+        if self.goal_format == 'polar':
+            additional_states = np.array(cartesian_to_polar(additional_states[0], additional_states[1]))
+
+        additional_states = np.append(additional_states, self.target_pos[2:])
 
         #additional_states = []
         # linear velocity along the x-axis
@@ -436,6 +445,8 @@ class NavigateEnv(BaseEnv):
         state = OrderedDict()
         if 'sensor' in self.output:
             state['sensor'] = self.get_additional_states()
+        if 'sensor_wo_goal' in self.output:
+            state['sensor_wo_goal'] = self.get_additional_states()[3:]
         if 'rgb' in self.output:
             state['rgb'] = self.get_rgb()
         if 'depth' in self.output:
