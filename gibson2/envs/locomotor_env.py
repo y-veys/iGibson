@@ -69,6 +69,7 @@ class NavigateEnv(BaseEnv):
         self.check_collision_loop = int(check_collision_distance_time / self.physics_timestep)
 
         self.additional_states_dim = self.config.get('additional_states_dim', 0)
+        self.goal_dim = self.config.get('goal_dim', 0)
         self.goal_format = self.config.get('goal_format', 'polar')
 
         # termination condition
@@ -111,13 +112,13 @@ class NavigateEnv(BaseEnv):
                                                shape=(self.sensor_dim,),
                                                dtype=np.float32)
             observation_space['sensor'] = self.sensor_space
-        if 'sensor_wo_goal' in self.output:
-            self.sensor_wo_goal_dim = self.additional_states_dim - 3 
-            self.sensor_wo_goal_space = gym.spaces.Box(low=-np.inf,
-                                                       high=np.inf,
-                                                       shape=(self.sensor_wo_goal_dim,),
-                                                       dtype=np.float32)
-            observation_space['sensor_wo_goal'] = self.sensor_wo_goal_space
+        if 'goal' in self.output:
+            self.goal_dim = self.goal_dim
+            self.goal_space = gym.spaces.Box(low=-np.inf,
+                                               high=np.inf,
+                                               shape=(self.goal_dim,),
+                                               dtype=np.float32)
+            observation_space['goal'] = self.goal_space
         if 'rgb' in self.output:
             self.rgb_space = gym.spaces.Box(low=0.0,
                                             high=1.0,
@@ -302,11 +303,11 @@ class NavigateEnv(BaseEnv):
         :return: non-perception observation, such as goal location
         """
         additional_states = []
-        additional_states = self.global_to_local(self.target_pos)[:2]
-        if self.goal_format == 'polar':
-            additional_states = np.array(cartesian_to_polar(additional_states[0], additional_states[1]))
+        #additional_states = self.global_to_local(self.target_pos)[:2]
+        #if self.goal_format == 'polar':
+        #    additional_states = np.array(cartesian_to_polar(additional_states[0], additional_states[1]))
 
-        additional_states = np.append(additional_states, self.target_pos[2:])
+        #additional_states = np.append(additional_states, self.target_pos[2:])
 
         #additional_states = []
         # linear velocity along the x-axis
@@ -340,6 +341,22 @@ class NavigateEnv(BaseEnv):
             'additional states dimension mismatch {} v.s. {}'.format(additional_states.shape[0], self.additional_states_dim)
 
         return additional_states
+
+    def get_goal(self):
+        """
+        :return: goal location
+        """
+        goal = []
+        goal = self.global_to_local(self.target_pos)[:2]
+        if self.goal_format == 'polar':
+            goal = np.array(cartesian_to_polar(goal[0], goal[1]))
+
+        goal = np.append(goal, self.target_pos[2:])
+
+        assert goal.shape[0] == self.goal_dim, \
+            'goal state dimension mismatch {} v.s. {}'.format(goal.shape[0], self.goal_dim)
+
+        return goal
 
     def add_naive_noise_to_sensor(self, sensor_reading, noise_rate, noise_value=1.0):
         """
@@ -445,8 +462,8 @@ class NavigateEnv(BaseEnv):
         state = OrderedDict()
         if 'sensor' in self.output:
             state['sensor'] = self.get_additional_states()
-        if 'sensor_wo_goal' in self.output:
-            state['sensor_wo_goal'] = self.get_additional_states()[3:]
+        if 'goal' in self.output:
+            state['goal'] = self.get_goal()
         if 'rgb' in self.output:
             state['rgb'] = self.get_rgb()
         if 'depth' in self.output:
