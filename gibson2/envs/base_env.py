@@ -1,5 +1,5 @@
 from gibson2.core.physics.robot_locomotors \
-    import Turtlebot, Husky, Ant, Humanoid, JR2, JR2_Kinova, JR2_Kinova_Head, Freight, Fetch, Locobot
+    import Turtlebot, Husky, Ant, Humanoid, JR2, JR2_Kinova, JR2_Kinova_Wrist, JR2_Kinova_Head, Freight, Fetch, Locobot
 from gibson2.core.simulator import Simulator
 from gibson2.core.physics.scene import EmptyScene, StadiumScene, BuildingScene
 import gibson2
@@ -100,6 +100,8 @@ class BaseEnv(gym.Env):
             robot = JR2(self.config)
         elif self.config['robot'] == 'JR2_Kinova':
             robot = JR2_Kinova(self.config)
+        elif self.config['robot'] == 'JR2_Kinova_Wrist':
+            robot = JR2_Kinova_Wrist(self.config)
         elif self.config['robot'] == 'JR2_Kinova_Head':
             robot = JR2_Kinova_Head(self.config)
         elif self.config['robot'] == 'Freight':
