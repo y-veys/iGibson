@@ -5,11 +5,11 @@ scene: stadium
 
 # robot
 robot: JR2_Kinova
-wheel_velocity: 0
-arm_velocity: 0
+wheel_velocity: 0.25
+arm_velocity: 0.25
 
 # task, observation and action
-task: focus # pointgoal|objectgoal|areagoal|reaching
+task: reaching # pointgoal|objectgoal|areagoal|reaching
 fisheye: false
 
 initial_pos: [0.0, 0.0, 0.0]
@@ -22,7 +22,7 @@ is_discrete: false
 additional_states_dim: 20
 
 # reward
-reward_type: pixel
+reward_type: l2
 success_reward: 10.0
 slack_reward: -0.01
 potential_reward_weight: 30.0
@@ -38,8 +38,10 @@ max_step: 100
 
 # sensor
 output: [rgb, depth, seg]
-resolution: 256
+resolution: 1024
 fov: 1.57
+image_width: 512
+image_height: 512
 
 # display
 use_filler: true
