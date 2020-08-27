@@ -97,6 +97,8 @@ class NavigateEnv(BaseEnv):
         # discount factor
         self.discount_factor = self.config.get('discount_factor', 0.99)
 
+        self.obstacles = []
+
     def load_observation_space(self):
         """
         Load observation space
@@ -246,12 +248,12 @@ class NavigateEnv(BaseEnv):
 
     def load_obstacles(self):
 
-        obstacle_1 = BoxShape(pos=[1, -2, 3], 
-                            dim=[0.75, 0.75, 1], 
+        obstacle_1 = BoxShape(pos=[1, np.random.uniform(-0.5,0.5), 0.075], 
+                            dim=[0.1, 0.5, 0.075], 
                             visual_only=False, 
                             mass=1000, 
-                            color=[1, 1, 1, 0.95])
-
+                            color=[1, 1, 0, 0.95])
+        '''
         obstacle_2 = BoxShape(pos=[2, 4, 3], 
                             dim=[1, 0.75, 1], 
                             visual_only=False, 
@@ -263,10 +265,16 @@ class NavigateEnv(BaseEnv):
                             visual_only=False, 
                             mass=1000, 
                             color=[1, 1, 1, 0.95])
+        '''
 
         self.simulator.import_object(obstacle_1)
-        self.simulator.import_object(obstacle_2)
-        self.simulator.import_object(obstacle_3)
+        #self.simulator.import_object(obstacle_2)
+        #self.simulator.import_object(obstacle_3)
+
+        obstacle_1.load()
+        obstacle_1.set_position([1,np.random.uniform(-0.5,0.5),0.075])
+
+        self.obstacles.append(obstacle_1)
 
 
     def load_miscellaneous_variables(self):
@@ -287,7 +295,7 @@ class NavigateEnv(BaseEnv):
         self.load_observation_space()
         self.load_action_space()
         self.load_visualization()
-        #self.load_obstacles()
+        self.load_obstacles()
         self.load_miscellaneous_variables()
 
     def global_to_local(self, pos):
@@ -425,7 +433,7 @@ class NavigateEnv(BaseEnv):
         #if self.num_object_classes is not None:
         #    seg = np.clip(seg * 255.0 / self.num_object_classes, 0.0, 1.0)
 
-        seg = np.clip(seg * 255.0 / 2, 0.0, 1.0)
+        seg = np.clip(seg * 255.0 / 3, 0.0, 1.0)
 
         return seg
 
@@ -525,6 +533,7 @@ class NavigateEnv(BaseEnv):
 
                 new_collision_per_sim_step.append(item)
             new_collision_links.append(new_collision_per_sim_step)
+
         return new_collision_links
 
     def get_position_of_interest(self):
@@ -854,6 +863,9 @@ class NavigateEnv(BaseEnv):
         self.reset_variables()
         self.step_visualization()
 
+        for obj in self.obstacles:
+            obj.set_position([1,np.random.uniform(-0.5,0.5),0.075])
+
         return state
 
 
@@ -920,7 +932,7 @@ class NavigateRandomEnv(NavigateEnv):
         self.target_pos = np.array(self.config.get('target_pos', [5, 5, 0]))
         self.target_orn = np.array(self.config.get('target_orn', [0, 0, 0]))
 
-        self.target_pos[0] = np.random.uniform(1.0, 3.0)
+        self.target_pos[0] = np.random.uniform(2.0, 3.0)
         self.target_pos[1] = np.random.uniform(-0.75, 0.75)
         self.target_pos[2] = np.random.uniform(0.5, 1.0)
 
