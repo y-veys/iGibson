@@ -248,7 +248,7 @@ class NavigateEnv(BaseEnv):
 
     def load_obstacles(self):
 
-        obstacle_1 = BoxShape(pos=[1, np.random.uniform(-0.5,0.5), 0.075], 
+        obstacle_1 = BoxShape(pos=[2, np.random.uniform(-0.5,0.5), 0.075], 
                             dim=[0.1, 0.5, 0.075], 
                             visual_only=False, 
                             mass=1000, 
@@ -272,7 +272,7 @@ class NavigateEnv(BaseEnv):
         #self.simulator.import_object(obstacle_3)
 
         obstacle_1.load()
-        obstacle_1.set_position([1,np.random.uniform(-0.5,0.5),0.075])
+        obstacle_1.set_position([2,np.random.uniform(-0.5,0.5),0.075])
 
         self.obstacles.append(obstacle_1)
 
@@ -864,7 +864,7 @@ class NavigateEnv(BaseEnv):
         self.step_visualization()
 
         for obj in self.obstacles:
-            obj.set_position([1,np.random.uniform(-0.5,0.5),0.075])
+            obj.set_position([2,np.random.uniform(-0.5,0.5),0.075])
 
         return state
 
