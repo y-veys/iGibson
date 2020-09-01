@@ -15,7 +15,7 @@ def main():
         for i in range(100):
             with Profiler('Env action step'):
                 action = nav_env.action_space.sample()
-                action = [1,1,0,0,0,0,0]
+                action = [0,0,0,0,0,0,0]
                 state, reward, done, info = nav_env.step(action)
                 if done:
                     print("Episode finished after {} timesteps".format(i + 1))
