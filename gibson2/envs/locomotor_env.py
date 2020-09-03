@@ -98,6 +98,7 @@ class NavigateEnv(BaseEnv):
         self.discount_factor = self.config.get('discount_factor', 0.99)
 
         self.obstacles = []
+        self.go_left = True
 
     def load_observation_space(self):
         """
@@ -248,8 +249,8 @@ class NavigateEnv(BaseEnv):
 
     def load_obstacles(self):
 
-        obstacle_1 = BoxShape(pos=[1.2, np.random.uniform(-0.6,0.6), 0.075], 
-                            dim=[0.05, 0.4, 0.075], 
+        obstacle_1 = BoxShape(pos=[1.2, 0, 0.075], 
+                            dim=[0.075, 0.4, 0.075], 
                             visual_only=False, 
                             mass=1000, 
                             color=[1, 1, 0, 0.95])
@@ -272,7 +273,7 @@ class NavigateEnv(BaseEnv):
         #self.simulator.import_object(obstacle_3)
 
         obstacle_1.load()
-        obstacle_1.set_position([1.2,np.random.uniform(-0.6,0.6),0.075])
+        obstacle_1.set_position_orientation([1.2, 0, 0.075], [0, 0, 0, 1])
 
         self.obstacles.append(obstacle_1)
 
@@ -311,11 +312,11 @@ class NavigateEnv(BaseEnv):
         :return: non-perception observation, such as goal location
         """
         additional_states = []
-        #additional_states = self.global_to_local(self.target_pos)[:2]
-        #if self.goal_format == 'polar':
-        #    additional_states = np.array(cartesian_to_polar(additional_states[0], additional_states[1]))
+        additional_states = self.global_to_local(self.target_pos)[:2]
+        if self.goal_format == 'polar':
+            additional_states = np.array(cartesian_to_polar(additional_states[0], additional_states[1]))
 
-        #additional_states = np.append(additional_states, self.target_pos[2:])
+        additional_states = np.append(additional_states, self.target_pos[2:])
 
         #additional_states = []
         # linear velocity along the x-axis
@@ -700,6 +701,23 @@ class NavigateEnv(BaseEnv):
             for i in range(num_nodes, self.num_waypoints_vis):
                 self.waypoints_vis[i].set_position(pos=np.array([0.0, 0.0, 100.0]))
         '''
+        for obj in self.obstacles:
+            curr_obj_pos = list(obj.get_position())
+
+            if curr_obj_pos[1] > 0.6 and not self.go_left: 
+                self.go_left = True
+            elif curr_obj_pos[1] < -0.6 and self.go_left: 
+                self.go_left = False 
+
+            if self.go_left:
+                curr_obj_pos[1] += -0.0125
+            elif not self.go_left: 
+                curr_obj_pos[1] += 0.0125
+
+            curr_obj_pos[0] = 1.2
+            curr_obj_pos[2] = 0.075
+
+            obj.set_position_orientation(curr_obj_pos, [0, 0, 0, 1])
 
     def step(self, action):
         """
@@ -864,7 +882,7 @@ class NavigateEnv(BaseEnv):
         self.step_visualization()
 
         for obj in self.obstacles:
-            obj.set_position([1.2,np.random.uniform(-0.6,0.6),0.075])
+            obj.set_position_orientation([1.2, 0 ,0.075], [0, 0, 0, 1])
 
         return state
 
