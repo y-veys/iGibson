@@ -704,15 +704,15 @@ class NavigateEnv(BaseEnv):
         for obj in self.obstacles:
             curr_obj_pos = list(obj.get_position())
 
-            if curr_obj_pos[1] > 0.6 and not self.go_left: 
+            if curr_obj_pos[1] > 0.7 and not self.go_left: 
                 self.go_left = True
-            elif curr_obj_pos[1] < -0.6 and self.go_left: 
+            elif curr_obj_pos[1] < -0.7 and self.go_left: 
                 self.go_left = False 
 
             if self.go_left:
-                curr_obj_pos[1] += -0.0125
+                curr_obj_pos[1] += -0.005
             elif not self.go_left: 
-                curr_obj_pos[1] += 0.0125
+                curr_obj_pos[1] += 0.005
 
             curr_obj_pos[0] = 1.2
             curr_obj_pos[2] = 0.075
