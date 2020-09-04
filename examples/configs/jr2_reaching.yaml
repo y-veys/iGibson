@@ -35,6 +35,7 @@ max_step: 1000
 output: [sensor]
 resolution: 256
 fov: 1.0472
+vertical_fov: 60
 
 use_filler: true
 display_ui: false

@@ -703,8 +703,8 @@ class JR2_Kinova_Wrist(LocomotorRobot):
         #self.ordered_joints[3].reset_joint_state(np.random.uniform(8.0*np.pi/24.0, 16.0*np.pi/24.0), 0.0)
         #self.ordered_joints[4].reset_joint_state(np.random.uniform(8.0*np.pi/24.0, 16.0*np.pi/24.0), 0.0)
         self.ordered_joints[2].reset_joint_state(-np.pi/2.0, 0.0)
-        self.ordered_joints[3].reset_joint_state(np.pi, 0.0)
-        self.ordered_joints[4].reset_joint_state(np.pi, 0.0)
+        self.ordered_joints[3].reset_joint_state(3.0*np.pi/4.0, 0.0)
+        self.ordered_joints[4].reset_joint_state(3.0*np.pi/4.0, 0.0)
         self.ordered_joints[5].reset_joint_state(np.pi / 2.0, 0.0)
         self.ordered_joints[6].reset_joint_state(0.0, 0.0)
 
