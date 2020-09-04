@@ -249,8 +249,8 @@ class NavigateEnv(BaseEnv):
 
     def load_obstacles(self):
 
-        obstacle_1 = BoxShape(pos=[1.2, 0, 0.075], 
-                            dim=[0.075, 0.25, 0.075], 
+        obstacle_1 = BoxShape(pos=[2.5, 0, 0.075], 
+                            dim=[0.075, 0.35, 0.075], 
                             visual_only=False, 
                             mass=1000, 
                             color=[1, 1, 0, 0.95])
@@ -273,7 +273,7 @@ class NavigateEnv(BaseEnv):
         #self.simulator.import_object(obstacle_3)
 
         obstacle_1.load()
-        obstacle_1.set_position_orientation([1.2, 0, 0.075], [0, 0, 0, 1])
+        obstacle_1.set_position_orientation([2.5, 0, 0.075], [0, 0, 0, 1])
 
         self.obstacles.append(obstacle_1)
 
@@ -704,17 +704,17 @@ class NavigateEnv(BaseEnv):
         for obj in self.obstacles:
             curr_obj_pos = list(obj.get_position())
 
-            if curr_obj_pos[1] > 0.7 and not self.go_left: 
+            if curr_obj_pos[1] > 0.6 and not self.go_left: 
                 self.go_left = True
-            elif curr_obj_pos[1] < -0.7 and self.go_left: 
+            elif curr_obj_pos[1] < -0.6 and self.go_left: 
                 self.go_left = False 
 
             if self.go_left:
-                curr_obj_pos[1] += -0.005
+                curr_obj_pos[1] += -0.0125
             elif not self.go_left: 
-                curr_obj_pos[1] += 0.005
+                curr_obj_pos[1] += 0.0125
 
-            curr_obj_pos[0] = 1.2
+            curr_obj_pos[0] = 2.5
             curr_obj_pos[2] = 0.075
 
             obj.set_position_orientation(curr_obj_pos, [0, 0, 0, 1])
@@ -882,7 +882,7 @@ class NavigateEnv(BaseEnv):
         self.step_visualization()
 
         for obj in self.obstacles:
-            obj.set_position_orientation([1.2, 0 ,0.075], [0, 0, 0, 1])
+            obj.set_position_orientation([2.5, 0 ,0.075], [0, 0, 0, 1])
 
         return state
 
@@ -950,7 +950,7 @@ class NavigateRandomEnv(NavigateEnv):
         self.target_pos = np.array(self.config.get('target_pos', [5, 5, 0]))
         self.target_orn = np.array(self.config.get('target_orn', [0, 0, 0]))
 
-        self.target_pos[0] = np.random.uniform(2.5, 3.5)
+        self.target_pos[0] = np.random.uniform(4.0, 5.0)
         self.target_pos[1] = np.random.uniform(-0.75, 0.75)
         self.target_pos[2] = np.random.uniform(0.5, 1.0)
 
