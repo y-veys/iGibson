@@ -100,6 +100,9 @@ class NavigateEnv(BaseEnv):
         self.obstacles = []
         self.go_left = True
 
+        self.walls = []
+        self.wall_positions = []
+
     def load_observation_space(self):
         """
         Load observation space
@@ -277,6 +280,53 @@ class NavigateEnv(BaseEnv):
 
         self.obstacles.append(obstacle_1)
 
+    def load_walls(self):
+
+        back_wall = BoxShape(pos=[-2.0, 0, 1.0], 
+                          dim=[0.1, 1.5, 1.0], 
+                          visual_only=False, 
+                          mass=1000, 
+                          color=[1, 1, 1, 1])
+
+        front_wall = BoxShape(pos=[8.0, 0, 1.0], 
+                          dim=[0.1, 1.5, 1.0], 
+                          visual_only=False, 
+                          mass=1000, 
+                          color=[1, 1, 1, 1])
+
+        left_wall = BoxShape(pos=[3.0, 1.6, 1.0], 
+                          dim=[5.1, 0.1, 1.0], 
+                          visual_only=False, 
+                          mass=1000, 
+                          color=[1, 1, 1, 1])
+
+        right_wall = BoxShape(pos=[3.0, -1.6, 1.0], 
+                          dim=[5.1, 0.1, 1.0], 
+                          visual_only=False, 
+                          mass=1000, 
+                          color=[1, 1, 1, 1])
+
+        self.simulator.import_object(back_wall)
+        self.simulator.import_object(front_wall)
+        self.simulator.import_object(left_wall)
+        self.simulator.import_object(right_wall)
+
+
+        back_wall.load()
+        front_wall.load()
+        left_wall.load()
+        right_wall.load()
+
+        back_wall.set_position_orientation([-2.0, 0, 1.0], [0, 0, 0, 1]) 
+        front_wall.set_position_orientation([8.0, 0, 1.0], [0, 0, 0, 1]) 
+        left_wall.set_position_orientation([3.0, 1.6, 1.0], [0, 0, 0, 1]) 
+        right_wall.set_position_orientation([3.0, -1.6, 1.0], [0, 0, 0, 1]) 
+
+        self.walls.append(back_wall)
+        self.walls.append(front_wall)
+        self.walls.append(left_wall)
+        self.walls.append(right_wall)
+
 
     def load_miscellaneous_variables(self):
         """
@@ -297,6 +347,7 @@ class NavigateEnv(BaseEnv):
         self.load_action_space()
         self.load_visualization()
         self.load_obstacles()
+        self.load_walls()
         self.load_miscellaneous_variables()
 
     def global_to_local(self, pos):
@@ -881,8 +932,12 @@ class NavigateEnv(BaseEnv):
         self.reset_variables()
         self.step_visualization()
 
-        for obj in self.obstacles:
-            obj.set_position_orientation([2.5, 0 ,0.075], [0, 0, 0, 1])
+        self.obstacles[0].set_position_orientation([2.5, 0 ,0.075], [0, 0, 0, 1])
+
+        self.walls[0].set_position_orientation([-2.0, 0, 1.0], [0, 0, 0, 1])
+        self.walls[1].set_position_orientation([8.0, 0, 1.0], [0, 0, 0, 1])
+        self.walls[2].set_position_orientation([3.0, 1.6, 1.0], [0, 0, 0, 1])
+        self.walls[3].set_position_orientation([3.0, -1.6, 1.0], [0, 0, 0, 1])
 
         return state
 
