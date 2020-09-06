@@ -253,7 +253,7 @@ class NavigateEnv(BaseEnv):
     def load_obstacles(self):
 
         obstacle_1 = BoxShape(pos=[2.5, 0, 0.075], 
-                            dim=[0.075, 0.775, 0.075], 
+                            dim=[0.075, 0.6, 0.075], 
                             visual_only=False, 
                             mass=1000, 
                             color=[1, 1, 0, 0.95])
