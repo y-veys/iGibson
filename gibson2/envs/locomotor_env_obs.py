@@ -18,7 +18,7 @@ import collections
 import logging
 
 
-class NavigateEnv(BaseEnv):
+class NavigateObstacleEnv(BaseEnv):
     """
     We define navigation environments following Anderson, Peter, et al. 'On evaluation of embodied navigation agents.'
     arXiv preprint arXiv:1807.06757 (2018). (https://arxiv.org/pdf/1807.06757.pdf)
@@ -43,7 +43,7 @@ class NavigateEnv(BaseEnv):
         :param automatic_reset: whether to automatic reset after an episode finishes
         :param device_idx: device_idx: which GPU to run the simulation and rendering on
         """
-        super(NavigateEnv, self).__init__(config_file=config_file,
+        super(NavigateObstacleEnv, self).__init__(config_file=config_file,
                                           model_id=model_id,
                                           mode=mode,
                                           action_timestep=action_timestep,
@@ -98,9 +98,6 @@ class NavigateEnv(BaseEnv):
         self.discount_factor = self.config.get('discount_factor', 0.99)
 
         self.obstacles = []
-        self.go_left = np.random.choice([0,1])
-        self.reset_step = 10
-
         self.walls = []
 
     def load_observation_space(self):
@@ -252,8 +249,8 @@ class NavigateEnv(BaseEnv):
 
     def load_obstacles(self):
 
-        obstacle_1 = BoxShape(pos=[2.5, 0, 0.075], 
-                            dim=[0.075, 0.6, 0.075], 
+        obstacle_1 = BoxShape(pos=[1.2, 0, 0.075], 
+                            dim=[0.075, 0.8, 0.075], 
                             visual_only=False, 
                             mass=1000, 
                             color=[1, 1, 0, 0.95])
@@ -280,26 +277,26 @@ class NavigateEnv(BaseEnv):
 
     def load_walls(self):
 
-        back_wall = BoxShape(pos=[-2.0, 0, 1.0], 
+        back_wall = BoxShape(pos=[-1.0, 0, 1.0], 
                           dim=[0.1, 1.5, 1.0], 
                           visual_only=False, 
                           mass=1000, 
                           color=[1, 1, 1, 1])
 
-        front_wall = BoxShape(pos=[8.0, 0, 1.0], 
+        front_wall = BoxShape(pos=[7.0, 0, 1.0], 
                           dim=[0.1, 1.5, 1.0], 
                           visual_only=False, 
                           mass=1000, 
                           color=[1, 1, 1, 1])
 
         left_wall = BoxShape(pos=[3.0, 1.6, 1.0], 
-                          dim=[5.1, 0.1, 1.0], 
+                          dim=[4.1, 0.1, 1.0], 
                           visual_only=False, 
                           mass=1000, 
                           color=[1, 1, 1, 1])
 
         right_wall = BoxShape(pos=[3.0, -1.6, 1.0], 
-                          dim=[5.1, 0.1, 1.0], 
+                          dim=[4.1, 0.1, 1.0], 
                           visual_only=False, 
                           mass=1000, 
                           color=[1, 1, 1, 1])
@@ -308,7 +305,6 @@ class NavigateEnv(BaseEnv):
         self.simulator.import_object(front_wall)
         self.simulator.import_object(left_wall)
         self.simulator.import_object(right_wall)
-
 
         back_wall.load()
         front_wall.load()
@@ -334,7 +330,7 @@ class NavigateEnv(BaseEnv):
         """
         Load navigation environment
         """
-        super(NavigateEnv, self).load()
+        super(NavigateObstacleEnv, self).load()
         self.load_task_setup()
         self.load_observation_space()
         self.load_action_space()
@@ -764,29 +760,6 @@ class NavigateEnv(BaseEnv):
 
             obj.set_position_orientation(curr_obj_pos, [0, 0, 0, 1])
         '''
-        curr_obj_pos = list(self.obstacles[0].get_position())
-
-        if (self.reset_step == 0):
-            self.go_left = np.random.choice([0,1])
-            self.reset_step = 10 
-
-        if curr_obj_pos[1] > 0.6 and not self.go_left: 
-            self.go_left = True
-        elif curr_obj_pos[1] < -0.6 and self.go_left: 
-            self.go_left = False 
-
-        if self.go_left:
-            curr_obj_pos[1] += -0.0125
-            self.reset_step -= 1 
-
-        elif not self.go_left: 
-            curr_obj_pos[1] += 0.0125
-            self.reset_step -= 1 
-
-        curr_obj_pos[0] = 2.5
-        curr_obj_pos[2] = 0.075
-
-        self.obstacles[0].set_position_orientation(curr_obj_pos, [0, 0, 0, 1])
 
     def step(self, action):
         """
@@ -950,17 +923,17 @@ class NavigateEnv(BaseEnv):
         self.reset_variables()
         self.step_visualization()
 
-        self.obstacles[0].set_position_orientation([2.5, np.random.uniform(-0.6,0.6) ,0.075], [0, 0, 0, 1])
+        self.obstacles[0].set_position_orientation([1.5, np.random.choice([-0.6,0.6]) ,0.075], [0, 0, 0, 1])
 
-        self.walls[0].set_position_orientation([-2.0, 0, 1.0], [0, 0, 0, 1])
-        self.walls[1].set_position_orientation([8.0, 0, 1.0], [0, 0, 0, 1])
+        self.walls[0].set_position_orientation([-1.0, 0, 1.0], [0, 0, 0, 1])
+        self.walls[1].set_position_orientation([7.0, 0, 1.0], [0, 0, 0, 1])
         self.walls[2].set_position_orientation([3.0, 1.6, 1.0], [0, 0, 0, 1])
         self.walls[3].set_position_orientation([3.0, -1.6, 1.0], [0, 0, 0, 1])
 
         return state
 
 
-class NavigateRandomEnv(NavigateEnv):
+class NavigateRandomObstacleEnv(NavigateObstacleEnv):
     def __init__(
             self,
             config_file,
@@ -983,7 +956,7 @@ class NavigateRandomEnv(NavigateEnv):
         :param random_height: whether to randomize height for target position (for reaching task)
         :param device_idx: device_idx: which GPU to run the simulation and rendering on
         """
-        super(NavigateRandomEnv, self).__init__(config_file,
+        super(NavigateRandomObstacleEnv, self).__init__(config_file,
                                                 model_id=model_id,
                                                 mode=mode,
                                                 action_timestep=action_timestep,
@@ -1040,268 +1013,5 @@ class NavigateRandomEnv(NavigateEnv):
             # reset "virtual floor" to the correct height
             self.scene.reset_floor(floor=self.floor_num, additional_elevation=0.02)
 
-        state = super(NavigateRandomEnv, self).reset()
+        state = super(NavigateRandomObstacleEnv, self).reset()
         return state
-
-class NavigateRandomHeightEnv(NavigateEnv):
-    def __init__(
-            self,
-            config_file,
-            model_id=None,
-            mode='headless',
-            action_timestep=1 / 10.0,
-            physics_timestep=1 / 240.0,
-            automatic_reset=False,
-            random_height=True,
-            device_idx=0,
-            render_to_tensor=False
-    ):
-        """
-        :param config_file: config_file path
-        :param model_id: override model_id in config file
-        :param mode: headless or gui mode
-        :param action_timestep: environment executes action per action_timestep second
-        :param physics_timestep: physics timestep for pybullet
-        :param automatic_reset: whether to automatic reset after an episode finishes
-        :param random_height: whether to randomize height for target position (for reaching task)
-        :param device_idx: device_idx: which GPU to run the simulation and rendering on
-        """
-        super(NavigateRandomHeightEnv, self).__init__(config_file,
-                                                model_id=model_id,
-                                                mode=mode,
-                                                action_timestep=action_timestep,
-                                                physics_timestep=physics_timestep,
-                                                automatic_reset=automatic_reset,
-                                                device_idx=device_idx,
-                                                render_to_tensor=render_to_tensor)
-
-    def reset_initial_and_target_pos(self):
-        """
-        Reset initial_pos, initial_orn and target_pos through randomization
-        The geodesic distance (or L2 distance if traversable map graph is not built)
-        between initial_pos and target_pos has to be between [self.target_dist_min, self.target_dist_max]
-        """
-        self.initial_pos = np.array(self.config.get('initial_pos', [0, 0, 0]))
-        self.initial_orn = np.array(self.config.get('initial_orn', [0, 0, 0]))
-        self.target_pos = np.array(self.config.get('target_pos', [5, 5, 0]))
-        self.target_orn = np.array(self.config.get('target_orn', [0, 0, 0]))
-
-        self.target_pos[2] = np.random.uniform(0.5, 1.0)
-
-    def reset(self):
-        """
-        Reset episode
-        """
-        self.floor_num = self.scene.get_random_floor()
-
-        if self.scene.is_interactive:
-            # reset scene objects
-            self.scene.reset_scene_objects()
-        else:
-            # reset "virtual floor" to the correct height
-            self.scene.reset_floor(floor=self.floor_num, additional_elevation=0.02)
-
-        state = super(NavigateRandomHeightEnv, self).reset()
-        return state
-
-class NavigateRandomEnvSim2Real(NavigateRandomEnv):
-    def __init__(self,
-                 config_file,
-                 model_id=None,
-                 mode='headless',
-                 action_timestep=1 / 10.0,
-                 physics_timestep=1 / 240.0,
-                 device_idx=0,
-                 render_to_tensor=False,
-                 automatic_reset=False,
-                 collision_reward_weight=0.0,
-                 track='static'
-                 ):
-        super(NavigateRandomEnvSim2Real, self).__init__(config_file,
-                                                        model_id=model_id,
-                                                        mode=mode,
-                                                        action_timestep=action_timestep,
-                                                        physics_timestep=physics_timestep,
-                                                        automatic_reset=automatic_reset,
-                                                        random_height=False,
-                                                        device_idx=device_idx,
-                                                        render_to_tensor=render_to_tensor)
-        self.collision_reward_weight = collision_reward_weight
-
-        assert track in ['static', 'interactive', 'dynamic'], 'unknown track'
-        self.track = track
-
-        if self.track == 'interactive':
-            self.interactive_objects_num_dups = 2
-            self.interactive_objects = self.load_interactive_objects()
-            # does not penalize collision with these interactive objects
-            self.collision_ignore_body_b_ids |= set([obj.body_id for obj in self.interactive_objects])
-        elif self.track == 'dynamic':
-            self.num_dynamic_objects = 1
-            self.dynamic_objects = []
-            self.dynamic_objects_last_actions = []
-            for _ in range(self.num_dynamic_objects):
-                robot = Turtlebot(self.config)
-                self.simulator.import_robot(robot)
-                self.dynamic_objects.append(robot)
-                self.dynamic_objects_last_actions.append(robot.action_space.sample())
-
-            # dynamic objects will repeat their actions for 10 action timesteps
-            self.dynamic_objects_action_repeat = 10
-
-    def load_interactive_objects(self):
-        """
-        Load interactive objects
-        :return: a list of interactive objects
-        """
-        interactive_objects = []
-        interactive_objects_path = [
-            'object_2eZY2JqYPQE.urdf',
-            'object_lGzQi2Pk5uC.urdf',
-            'object_ZU6u5fvE8Z1.urdf',
-            'object_H3ygj6efM8V.urdf',
-            'object_RcqC01G24pR.urdf'
-        ]
-
-        for _ in range(self.interactive_objects_num_dups):
-            for urdf_model in interactive_objects_path:
-                obj = InteractiveObj(os.path.join(gibson2.assets_path, 'models/sample_urdfs', urdf_model))
-                self.simulator.import_object(obj)
-                interactive_objects.append(obj)
-        return interactive_objects
-
-    def reset_interactive_objects(self):
-        """
-        Reset the poses of interactive objects to have no collisions with the scene mesh
-        """
-        max_trials = 100
-        for obj in self.interactive_objects:
-            reset_success = False
-            for _ in range(max_trials):
-                _, pos = self.scene.get_random_point_floor(self.floor_num, self.random_height)
-                orn = np.array([0, 0, np.random.uniform(0, np.pi * 2)])
-                if self.test_valid_position('obj', obj, pos, orn):
-                    reset_success = True
-                    break
-
-            if not reset_success:
-                print("WARNING: Failed to reset interactive obj without collision")
-
-            self.land('obj', obj, pos, orn)
-
-    def reset_dynamic_objects(self):
-        """
-        Reset the poses of dynamic objects to have no collisions with the scene mesh
-        """
-        max_trials = 100
-        shortest_path, _ = self.get_shortest_path(entire_path=True)
-        floor_height = 0.0 if self.floor_num is None else self.scene.get_floor_height(self.floor_num)
-        for robot in self.dynamic_objects:
-            reset_success = False
-            for _ in range(max_trials):
-                pos = shortest_path[np.random.choice(shortest_path.shape[0])]
-                pos = np.array([pos[0], pos[1], floor_height])
-                orn = np.array([0, 0, np.random.uniform(0, np.pi * 2)])
-                if self.test_valid_position('robot', robot, pos, orn):
-                    reset_success = True
-                    break
-
-            if not reset_success:
-                print("WARNING: Failed to reset dynamic obj without collision")
-
-            self.land('robot', robot, pos, orn)
-
-    def step_dynamic_objects(self):
-        """
-        Apply actions to dynamic objects (default: temporally extended random walk)
-        """
-        if self.current_step % self.dynamic_objects_action_repeat == 0:
-            self.dynamic_objects_last_actions = [robot.action_space.sample() for robot in self.dynamic_objects]
-        for robot, action in zip(self.dynamic_objects, self.dynamic_objects_last_actions):
-            robot.apply_action(action)
-
-    def step(self, action):
-        """
-        Step dynamic objects as well
-        """
-        if self.track == 'dynamic':
-            self.step_dynamic_objects()
-
-        return super(NavigateRandomEnvSim2Real, self).step(action)
-
-    def reset(self):
-        """
-        Reset episode
-        """
-        self.floor_num = self.scene.get_random_floor()
-
-        if self.scene.is_interactive:
-            # reset scene objects
-            self.scene.reset_scene_objects()
-        else:
-            # reset "virtual floor" to the correct height
-            self.scene.reset_floor(floor=self.floor_num, additional_elevation=0.02)
-
-        if self.track == 'interactive':
-            self.reset_interactive_objects()
-
-        state = NavigateEnv.reset(self)
-
-        if self.track == 'dynamic':
-            self.reset_dynamic_objects()
-            state = self.get_state()
-
-        return state
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '--config',
-        '-c',
-        help='which config file to use [default: use yaml files in examples/configs]')
-    parser.add_argument('--mode',
-                        '-m',
-                        choices=['headless', 'gui'],
-                        default='pbgui',
-                        help='which mode for simulation (default: headless)')
-    parser.add_argument('--env_type',
-                        choices=['deterministic', 'random', 'sim2real'],
-                        default='random',
-                        help='which environment type (deterministic | random | sim2real)')
-    parser.add_argument('--sim2real_track',
-                        choices=['static', 'interactive', 'dynamic'],
-                        default='static',
-                        help='which sim2real track (static | interactive | dynamic)')
-    args = parser.parse_args()
-
-    if args.env_type == 'deterministic':
-        nav_env = NavigateEnv(config_file=args.config,
-                              mode=args.mode,
-                              action_timestep=1.0 / 10.0,
-                              physics_timestep=1.0 / 40.0)
-    elif args.env_type == 'random':
-        nav_env = NavigateRandomEnv(config_file=args.config,
-                                    mode=args.mode,
-                                    action_timestep=1.0 / 10.0,
-                                    physics_timestep=1.0 / 40.0)
-    elif args.env_type == 'sim2real':
-        nav_env = NavigateRandomEnvSim2Real(config_file=args.config,
-                                            mode=args.mode,
-                                            action_timestep=1.0 / 10.0,
-                                            physics_timestep=1.0 / 40.0,
-                                            track=args.sim2real_track)
-
-    step_time_list = []
-    for episode in range(100):
-        print('Episode: {}'.format(episode))
-        start = time.time()
-        nav_env.reset()
-        for _ in range(100):  # 10 seconds
-            action = nav_env.action_space.sample()
-            state, reward, done, _ = nav_env.step(action)
-            print('reward', reward)
-            if done:
-                break
-        print('Episode finished after {} timesteps, took {} seconds.'.format(nav_env.current_step, time.time() - start))
-    nav_env.clean()
