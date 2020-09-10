@@ -249,7 +249,7 @@ class NavigateObstacleEnv(BaseEnv):
 
     def load_obstacles(self):
 
-        obstacle_1 = BoxShape(pos=[2.5, 0, 0.075], 
+        obstacle_1 = BoxShape(pos=[0.8, 0, 0.075], 
                             dim=[0.075, 0.8, 0.075], 
                             visual_only=False, 
                             mass=1000, 
@@ -924,7 +924,7 @@ class NavigateObstacleEnv(BaseEnv):
         self.reset_variables()
         self.step_visualization()
 
-        self.obstacles[0].set_position_orientation([2.5, np.random.choice([-0.6,0.6]) ,0.075], [0, 0, 0, 1])
+        self.obstacles[0].set_position_orientation([0.8, np.random.choice([-0.6,0.6]) ,0.075], [0, 0, 0, 1])
 
         self.walls[0].set_position_orientation([-1.0, 0, 1.0], [0, 0, 0, 1])
         self.walls[1].set_position_orientation([7.0, 0, 1.0], [0, 0, 0, 1])
