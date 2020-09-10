@@ -360,7 +360,8 @@ class NavigateEnv(BaseEnv):
         if self.goal_format == 'polar':
             additional_states = np.array(cartesian_to_polar(additional_states[0], additional_states[1]))
 
-        additional_states = np.append(additional_states, self.target_pos[2:])
+        if self.config['task'] == 'reaching': 
+            additional_states = np.append(additional_states, self.target_pos[2:])
 
         #additional_states = []
         # linear velocity along the x-axis
@@ -1025,7 +1026,8 @@ class NavigateRandomEnv(NavigateEnv):
 
         self.target_pos[0] = np.random.uniform(4.0, 5.0)
         self.target_pos[1] = np.random.uniform(-0.75, 0.75)
-        self.target_pos[2] = np.random.uniform(0.5, 1.0)
+        #self.target_pos[2] = np.random.uniform(0.5, 1.0)
+        self.target_pos[2] = 0
 
     def reset(self):
         """
