@@ -249,7 +249,7 @@ class NavigateObstacleEnv(BaseEnv):
 
     def load_obstacles(self):
 
-        obstacle_1 = BoxShape(pos=[1.2, 0, 0.075], 
+        obstacle_1 = BoxShape(pos=[2.5, 0, 0.075], 
                             dim=[0.075, 0.8, 0.075], 
                             visual_only=False, 
                             mass=1000, 
@@ -356,7 +356,8 @@ class NavigateObstacleEnv(BaseEnv):
         if self.goal_format == 'polar':
             additional_states = np.array(cartesian_to_polar(additional_states[0], additional_states[1]))
 
-        additional_states = np.append(additional_states, self.target_pos[2:])
+        if self.config['task'] == 'reaching':
+            additional_states = np.append(additional_states, self.target_pos[2:])
 
         #additional_states = []
         # linear velocity along the x-axis
@@ -923,7 +924,7 @@ class NavigateObstacleEnv(BaseEnv):
         self.reset_variables()
         self.step_visualization()
 
-        self.obstacles[0].set_position_orientation([1.5, np.random.choice([-0.6,0.6]) ,0.075], [0, 0, 0, 1])
+        self.obstacles[0].set_position_orientation([2.5, np.random.choice([-0.6,0.6]) ,0.075], [0, 0, 0, 1])
 
         self.walls[0].set_position_orientation([-1.0, 0, 1.0], [0, 0, 0, 1])
         self.walls[1].set_position_orientation([7.0, 0, 1.0], [0, 0, 0, 1])
@@ -998,7 +999,8 @@ class NavigateRandomObstacleEnv(NavigateObstacleEnv):
 
         self.target_pos[0] = np.random.uniform(4.0, 5.0)
         self.target_pos[1] = np.random.uniform(-0.75, 0.75)
-        self.target_pos[2] = np.random.uniform(0.5, 1.0)
+        #self.target_pos[2] = np.random.uniform(0.5, 1.0)
+        self.target_pos[2] = 0
 
     def reset(self):
         """
