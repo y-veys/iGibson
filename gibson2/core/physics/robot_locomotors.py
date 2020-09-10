@@ -735,10 +735,10 @@ class JR2_Kinova_Head(LocomotorRobot):
         self.head_velocity = config.get('head_velocity', 0.05)
         self.head_dim = 1
         self.arm_velocity = config.get('arm_velocity', 1.0)
-        self.arm_dim = 5
+        self.arm_dim = 0
 
         LocomotorRobot.__init__(self,
-                                "jr2_urdf/jr2_kinova_head.urdf",
+                                "jr2_urdf/jr2_head.urdf",
                                 action_dim=self.wheel_dim + self.head_dim + self.arm_dim, 
                                 scale=config.get("robot_scale", 1.0),
                                 is_discrete=config.get("is_discrete", False),
@@ -762,11 +762,11 @@ class JR2_Kinova_Head(LocomotorRobot):
     # initialize JR's arm to almost the same height as the door handle to ease exploration
     def robot_specific_reset(self):
         super(JR2_Kinova_Head, self).robot_specific_reset()
-        self.ordered_joints[3].reset_joint_state(np.random.uniform(-3.0*np.pi/4.0, -np.pi/2.0), 0.0)
-        self.ordered_joints[4].reset_joint_state(np.random.uniform(np.pi/4.0, 3.0*np.pi/4.0), 0.0)
-        self.ordered_joints[5].reset_joint_state(np.random.uniform(np.pi/4.0, 3.0*np.pi/4.0), 0.0)
-        self.ordered_joints[6].reset_joint_state(np.pi / 2.0, 0.0)
-        self.ordered_joints[7].reset_joint_state(0.0, 0.0)
+        #self.ordered_joints[3].reset_joint_state(np.random.uniform(-3.0*np.pi/4.0, -np.pi/2.0), 0.0)
+        #self.ordered_joints[4].reset_joint_state(np.random.uniform(np.pi/4.0, 3.0*np.pi/4.0), 0.0)
+        #self.ordered_joints[5].reset_joint_state(np.random.uniform(np.pi/4.0, 3.0*np.pi/4.0), 0.0)
+        #self.ordered_joints[6].reset_joint_state(np.pi / 2.0, 0.0)
+        #self.ordered_joints[7].reset_joint_state(0.0, 0.0)
 
     def load(self):
         ids = super(JR2_Kinova_Head, self).load()
