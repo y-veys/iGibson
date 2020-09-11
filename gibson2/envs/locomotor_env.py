@@ -479,7 +479,7 @@ class NavigateEnv(BaseEnv):
         #if self.num_object_classes is not None:
         #    seg = np.clip(seg * 255.0 / self.num_object_classes, 0.0, 1.0)
 
-        seg = np.clip(seg * 255.0 / 3, 0.0, 1.0)
+        seg = np.clip(seg * 255.0 / 4, 0.0, 1.0)
 
         return seg
 
