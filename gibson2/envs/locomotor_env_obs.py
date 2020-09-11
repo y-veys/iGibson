@@ -924,7 +924,7 @@ class NavigateObstacleEnv(BaseEnv):
         self.reset_variables()
         self.step_visualization()
 
-        self.obstacles[0].set_position_orientation([0.8, np.random.choice([-0.6,0.6]) ,0.075], [0, 0, 0, 1])
+        self.obstacles[0].set_position_orientation([2.5, np.random.choice([-0.6,0.6]) ,0.075], [0, 0, 0, 1])
 
         self.walls[0].set_position_orientation([-1.0, 0, 1.0], [0, 0, 0, 1])
         self.walls[1].set_position_orientation([7.0, 0, 1.0], [0, 0, 0, 1])
