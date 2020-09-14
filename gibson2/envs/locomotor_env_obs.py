@@ -250,17 +250,18 @@ class NavigateObstacleEnv(BaseEnv):
     def load_obstacles(self):
 
         obstacle_1 = BoxShape(pos=[0.8, 0, 0.075], 
-                            dim=[0.075, 0.6, 0.075], 
+                            dim=[0.075, 0.8, 0.075], 
                             visual_only=False, 
                             mass=1000, 
                             color=[1, 1, 0, 0.95])
-        '''
-        obstacle_2 = BoxShape(pos=[2, 4, 3], 
-                            dim=[1, 0.75, 1], 
+        
+        obstacle_2 = BoxShape(pos=[0.8, 0, 0.075], 
+                            dim=[0.075, 0.8, 0.075], 
                             visual_only=False, 
-                            mass=1000, 
-                            color=[1, 1, 1, 0.95])
+                            mass=0, 
+                            color=[1, 1, 0, 0.95])
 
+        '''
         obstacle_3 = BoxShape(pos=[-1, 2, 3], 
                             dim=[0.75, 1, 1], 
                             visual_only=False, 
@@ -269,11 +270,14 @@ class NavigateObstacleEnv(BaseEnv):
         '''
 
         self.simulator.import_object(obstacle_1)
-        #self.simulator.import_object(obstacle_2)
+        self.simulator.import_object(obstacle_2)
         #self.simulator.import_object(obstacle_3)
 
         obstacle_1.load()
         self.obstacles.append(obstacle_1)
+
+        obstacle_2.load()
+        self.obstacles.append(obstacle_2)
 
     def load_walls(self):
 
@@ -475,7 +479,7 @@ class NavigateObstacleEnv(BaseEnv):
         #if self.num_object_classes is not None:
         #    seg = np.clip(seg * 255.0 / self.num_object_classes, 0.0, 1.0)
 
-        seg = np.clip(seg * 255.0 / 4, 0.0, 1.0)
+        seg = np.clip(seg * 255.0 / 5, 0.0, 1.0)
 
         return seg
 
@@ -924,7 +928,11 @@ class NavigateObstacleEnv(BaseEnv):
         self.reset_variables()
         self.step_visualization()
 
-        self.obstacles[0].set_position_orientation([np.random.uniform(2.0,2.5), np.random.uniform(-0.7,0.7) ,0.075], [0, 0, 0, 1])
+        self.obstacles[0].set_position_orientation([1.7, np.random.choice([-0.7,0.7]) ,0.075], [0, 0, 0, 1])
+
+        obstacle_1_y_pos = self.obstacles[0].get_position()[1]
+        self.obstacles[1].set_position_orientation([3.2, -obstacle_1_y_pos ,1.2], [0, 0, 0, 1])
+
 
         self.walls[0].set_position_orientation([-1.0, 0, 1.0], [0, 0, 0, 1])
         self.walls[1].set_position_orientation([7.0, 0, 1.0], [0, 0, 0, 1])
