@@ -930,8 +930,8 @@ class NavigateObstacleEnv(BaseEnv):
 
         self.obstacles[0].set_position_orientation([1.7, np.random.choice([-0.7,0.7]) ,0.075], [0, 0, 0, 1])
 
-        obstacle_1_y_pos = self.obstacles[0].get_position()[1]
-        self.obstacles[1].set_position_orientation([3.2, -obstacle_1_y_pos ,1.2], [0, 0, 0, 1])
+        #obstacle_1_y_pos = self.obstacles[0].get_position()[1]
+        self.obstacles[1].set_position_orientation([3.2, np.random.choice([-0.7, 0.7]),1.2], [0, 0, 0, 1])
 
 
         self.walls[0].set_position_orientation([-1.0, 0, 1.0], [0, 0, 0, 1])
