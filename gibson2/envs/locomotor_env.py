@@ -746,7 +746,7 @@ class NavigateEnv(BaseEnv):
             for i in range(num_nodes, self.num_waypoints_vis):
                 self.waypoints_vis[i].set_position(pos=np.array([0.0, 0.0, 100.0]))
         '''
-        
+        '''
         for obj in self.obstacles:
             curr_obj_pos = list(obj.get_position())
 
@@ -771,9 +771,9 @@ class NavigateEnv(BaseEnv):
             self.go_left = np.random.choice([0,1])
             self.reset_step = 10 
 
-        if curr_obj_pos[1] > 0.6 and not self.go_left: 
+        if curr_obj_pos[1] > 0.7 and not self.go_left: 
             self.go_left = True
-        elif curr_obj_pos[1] < -0.6 and self.go_left: 
+        elif curr_obj_pos[1] < -0.7 and self.go_left: 
             self.go_left = False 
 
         if self.go_left:
@@ -784,11 +784,11 @@ class NavigateEnv(BaseEnv):
             curr_obj_pos[1] += 0.0125
             self.reset_step -= 1 
 
-        curr_obj_pos[0] = 2.5
+        curr_obj_pos[0] = 0.8
         curr_obj_pos[2] = 0.075
 
         self.obstacles[0].set_position_orientation(curr_obj_pos, [0, 0, 0, 1])
-        '''
+        
 
     def step(self, action):
         """
@@ -952,7 +952,7 @@ class NavigateEnv(BaseEnv):
         self.reset_variables()
         self.step_visualization()
 
-        self.obstacles[0].set_position_orientation([2.5, np.random.uniform(-0.6,0.6) ,0.075], [0, 0, 0, 1])
+        self.obstacles[0].set_position_orientation([0.8, np.random.uniform(-0.6,0.6) ,0.075], [0, 0, 0, 1])
 
         self.walls[0].set_position_orientation([-2.0, 0, 1.0], [0, 0, 0, 1])
         self.walls[1].set_position_orientation([8.0, 0, 1.0], [0, 0, 0, 1])
