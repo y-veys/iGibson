@@ -760,7 +760,7 @@ class NavigateEnv(BaseEnv):
             elif not self.go_left: 
                 curr_obj_pos[1] += 0.01
 
-            curr_obj_pos[0] = 0.8
+            curr_obj_pos[0] = 1.5
             curr_obj_pos[2] = 0.075
 
             obj.set_position_orientation(curr_obj_pos, [0, 0, 0, 1])
@@ -967,7 +967,7 @@ class NavigateEnv(BaseEnv):
         self.reset_variables()
         self.step_visualization()
 
-        self.obstacles[0].set_position_orientation([0.8, np.random.uniform(-0.6,0.6) ,0.075], [0, 0, 0, 1])
+        self.obstacles[0].set_position_orientation([1.5, np.random.uniform(-0.6,0.6) ,0.075], [0, 0, 0, 1])
 
         self.walls[0].set_position_orientation([-2.0, 0, 1.0], [0, 0, 0, 1])
         self.walls[1].set_position_orientation([8.0, 0, 1.0], [0, 0, 0, 1])
