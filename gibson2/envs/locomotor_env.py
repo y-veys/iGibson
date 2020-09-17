@@ -238,7 +238,7 @@ class NavigateEnv(BaseEnv):
             #                                       length=5)
             self.target_pos_vis_obj = VisualMarker(visual_shape=p.GEOM_SPHERE,
                                                    rgba_color=[1, 0, 0, 1],
-                                                   radius=0.05)
+                                                   radius=0.1)
 
             #self.initial_pos_vis_obj.load()
 
@@ -253,7 +253,7 @@ class NavigateEnv(BaseEnv):
     def load_obstacles(self):
 
         obstacle_1 = BoxShape(pos=[2.5, 0, 0.075], 
-                            dim=[0.075, 0.7, 0.075], 
+                            dim=[0.075, 0.8, 0.075], 
                             visual_only=False, 
                             mass=1000, 
                             color=[1, 1, 0, 0.95])
@@ -765,6 +765,7 @@ class NavigateEnv(BaseEnv):
 
             obj.set_position_orientation(curr_obj_pos, [0, 0, 0, 1])
         '''
+        '''
         curr_obj_pos = list(self.obstacles[0].get_position())
 
         if (self.reset_step == 0):
@@ -788,7 +789,7 @@ class NavigateEnv(BaseEnv):
         curr_obj_pos[2] = 0.075
 
         self.obstacles[0].set_position_orientation(curr_obj_pos, [0, 0, 0, 1])
-        
+        '''
 
     def step(self, action):
         """
@@ -966,7 +967,7 @@ class NavigateEnv(BaseEnv):
         self.reset_variables()
         self.step_visualization()
 
-        self.obstacles[0].set_position_orientation([1.5, np.random.uniform(-0.7,0.7) ,0.075], [0, 0, 0, 1])
+        self.obstacles[0].set_position_orientation([1.5, np.random.choice([-0.7,0.7]) ,0.075], [0, 0, 0, 1])
 
         self.walls[0].set_position_orientation([-2.0, 0, 1.0], [0, 0, 0, 1])
         self.walls[1].set_position_orientation([8.0, 0, 1.0], [0, 0, 0, 1])
