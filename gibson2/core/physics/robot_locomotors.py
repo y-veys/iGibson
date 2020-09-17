@@ -118,6 +118,7 @@ class LocomotorRobot(BaseRobot):
             j.set_motor_velocity(0.0)
 
     def apply_robot_action(self, action):
+        action = np.append(action,[0])
         if self.control == 'torque':
             for n, j in enumerate(self.ordered_joints):
                 j.set_motor_torque(self.torque_coef * j.max_torque * float(np.clip(action[n], -1, +1)))
@@ -733,7 +734,7 @@ class JR2_Kinova_Head(LocomotorRobot):
         self.wheel_velocity = config.get('wheel_velocity', 0.3)
         self.wheel_dim = 2
         self.head_velocity = config.get('head_velocity', 0.05)
-        self.head_dim = 1
+        self.head_dim = 0
         self.arm_velocity = config.get('arm_velocity', 1.0)
         self.arm_dim = 0
 

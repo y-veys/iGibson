@@ -814,6 +814,21 @@ class NavigateEnv(BaseEnv):
             state = self.reset()
         return state, reward, done, info
 
+    def set_camera(self, camera_mask_indices):
+        """
+        Set the camera based on the index in the input. If the index is 0, set it to most upwards position. 
+        If the index is 2, set it to most downwards position. Otherwise, it should be in the center. 
+        """
+        print(camera_mask_indices[0])
+        if camera_mask_indices[0] == 0: 
+            self.robots[0].ordered_joints[2].reset_joint_state(-0.52, 0.0)
+
+        elif camera_mask_indices[0] == 2: 
+            self.robots[0].ordered_joints[2].reset_joint_state(0.52, 0.0)
+
+        else: 
+            self.robots[0].ordered_joints[2].reset_joint_state(0.0, 0.0)
+
     def reset_agent(self):
         """
         Reset the robot's joint configuration and base pose until no collision

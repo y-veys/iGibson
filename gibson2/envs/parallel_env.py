@@ -108,6 +108,12 @@ class ParallelNavEnvironment(NavigateEnv):
             time_steps = [promise() for promise in time_steps]
         return time_steps
 
+    def set_camera(self, camera_mask_indices):
+        time_steps = [env.set_camera(camera_mask_index, self._blocking) for env, camera_mask_index in zip(self._envs, camera_mask_indices)]
+        if not self._blocking:
+            time_steps = [promise() for promise in time_steps]
+        return time_steps
+
     #def _stack_time_steps(self, time_steps):
     #  """Given a list of TimeStep, combine to one with a batch dimension."""
     #  if self._flatten:
@@ -291,6 +297,13 @@ class ProcessPyEnvironment(object):
         else:
             return promise
 
+    def set_camera(self, camera_mask_indices, blocking=True):
+        promise = self.call('set_camera', camera_mask_indices)
+        if blocking:
+            return promise()
+        else:
+            return promise
+
     def _receive(self):
         """Wait for a message from the worker process and return its payload.
 
@@ -345,7 +358,7 @@ class ProcessPyEnvironment(object):
                     continue
                 if message == self._CALL:
                     name, args, kwargs = payload
-                    if name == 'step' or name == 'reset' or name == 'set_subgoal' or name == 'set_subgoal_type':
+                    if name == 'step' or name == 'reset' or name == 'set_subgoal' or name == 'set_subgoal_type' or name == 'set_camera':
                         result = getattr(env, name)(*args, **kwargs)
                     #result = []
                     #if flatten and name == 'step' or name == 'reset':
