@@ -102,6 +102,8 @@ class NavigateEnv(BaseEnv):
         self.go_left_2 = np.random.choice([0,1])
         self.option = np.random.choice([0,1])
 
+        self.num_obstacles = 1
+
         self.reset_step = 25
         self.walls = []
 
@@ -259,29 +261,22 @@ class NavigateEnv(BaseEnv):
                             visual_only=False, 
                             mass=0, 
                             color=[1, 1, 0, 0.95])
-        
-        obstacle_2 = BoxShape(pos=[3.0, 0, 1.2], 
-                            dim=[0.075, 0.75, 0.075], 
-                            visual_only=False, 
-                            mass=0, 
-                            color=[0, 0, 1, 0.95])
-        '''
-        obstacle_3 = BoxShape(pos=[-1, 2, 3], 
-                            dim=[0.75, 1, 1], 
-                            visual_only=False, 
-                            mass=1000, 
-                            color=[1, 1, 1, 0.95])
-        '''
 
         self.simulator.import_object(obstacle_1)
-        self.simulator.import_object(obstacle_2)
-        #self.simulator.import_object(obstacle_3)
-
         obstacle_1.load()
         self.obstacles.append(obstacle_1)
 
-        obstacle_2.load()
-        self.obstacles.append(obstacle_2)
+        if self.num_obstacles == 2: 
+        
+            obstacle_2 = BoxShape(pos=[3.0, 0, 1.2], 
+                                dim=[0.075, 0.75, 0.075], 
+                                visual_only=False, 
+                                mass=0, 
+                                color=[0, 0, 1, 0.95])
+
+            self.simulator.import_object(obstacle_2)
+            obstacle_2.load()
+            self.obstacles.append(obstacle_2)
 
 
     def load_walls(self):
@@ -758,7 +753,6 @@ class NavigateEnv(BaseEnv):
         '''
         
         obj_1 = list(self.obstacles[0].get_position())
-        obj_2 = list(self.obstacles[1].get_position())
 
         if obj_1[1] > 0.7 and not self.go_left_1: 
             self.go_left_1 = True
@@ -777,25 +771,30 @@ class NavigateEnv(BaseEnv):
         else: 
             obj_1[2] = 1.2
 
-        if obj_2[1] > 0.7 and not self.go_left_2: 
-            self.go_left_2 = True
-        elif obj_2[1] < -0.7 and self.go_left_2: 
-            self.go_left_2 = False 
-
-        if self.go_left_2:
-            obj_2[1] += -0.02
-        elif not self.go_left_2: 
-            obj_2[1] += 0.02
-
-        obj_2[0] = 3.0
-
-        if self.option == 0: 
-            obj_2[2] = 1.2
-        else: 
-            obj_2[2] = 0.075
-
         self.obstacles[0].set_position_orientation(obj_1, [0, 0, 0, 1])
-        self.obstacles[1].set_position_orientation(obj_2, [0, 0, 0, 1])
+
+        if self.num_obstacles == 2: 
+
+            obj_2 = list(self.obstacles[1].get_position())
+
+            if obj_2[1] > 0.7 and not self.go_left_2: 
+                self.go_left_2 = True
+            elif obj_2[1] < -0.7 and self.go_left_2: 
+                self.go_left_2 = False 
+
+            if self.go_left_2:
+                obj_2[1] += -0.02
+            elif not self.go_left_2: 
+                obj_2[1] += 0.02
+
+            obj_2[0] = 3.0
+
+            if self.option == 0: 
+                obj_2[2] = 1.2
+            else: 
+                obj_2[2] = 0.075
+        
+            self.obstacles[1].set_position_orientation(obj_2, [0, 0, 0, 1])
         
         
         '''
@@ -1031,16 +1030,20 @@ class NavigateEnv(BaseEnv):
 
         self.go_left_1 = np.random.choice([0,1])
         self.go_left_2 = np.random.choice([0,1])
-        self.option = np.random.choice([0,1])
-        #self.option = 0
+        #self.option = np.random.choice([0,1])
+        self.option = 0
 
         if self.option == 0: 
             self.obstacles[0].set_position_orientation([1.5, np.random.uniform(-0.7,0.7) ,0.075], [0, 0, 0, 1])
-            self.obstacles[1].set_position_orientation([3.0, np.random.uniform(-0.7,0.7) ,1.2], [0, 0, 0, 1])
+
+            if self.num_obstacles == 2: 
+                self.obstacles[1].set_position_orientation([3.0, np.random.uniform(-0.7,0.7) ,1.2], [0, 0, 0, 1])
 
         else: 
             self.obstacles[0].set_position_orientation([1.5, np.random.uniform(-0.7,0.7) ,1.2], [0, 0, 0, 1])
-            self.obstacles[1].set_position_orientation([3.0, np.random.uniform(-0.7,0.7) ,0.075], [0, 0, 0, 1])
+
+            if self.num_obstacles == 2: 
+                self.obstacles[1].set_position_orientation([3.0, np.random.uniform(-0.7,0.7) ,0.075], [0, 0, 0, 1])
 
         self.walls[0].set_position_orientation([-2.0, 0, 1.0], [0, 0, 0, 1])
         self.walls[1].set_position_orientation([8.0, 0, 1.0], [0, 0, 0, 1])
