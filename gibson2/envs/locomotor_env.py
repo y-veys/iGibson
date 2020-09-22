@@ -100,8 +100,9 @@ class NavigateEnv(BaseEnv):
         self.obstacles = []
         self.go_left_1 = np.random.choice([0,1])
         self.go_left_2 = np.random.choice([0,1])
-        self.reset_step = 25
+        self.option = np.random.choice([0,1])
 
+        self.reset_step = 25
         self.walls = []
 
     def load_observation_space(self):
@@ -254,13 +255,13 @@ class NavigateEnv(BaseEnv):
     def load_obstacles(self):
 
         obstacle_1 = BoxShape(pos=[1.5, 0, 0.075], 
-                            dim=[0.075, 0.6, 0.075], 
+                            dim=[0.075, 0.75, 0.075], 
                             visual_only=False, 
-                            mass=1000, 
+                            mass=0, 
                             color=[1, 1, 0, 0.95])
         
         obstacle_2 = BoxShape(pos=[3.0, 0, 1.2], 
-                            dim=[0.075, 0.6, 0.075], 
+                            dim=[0.075, 0.75, 0.075], 
                             visual_only=False, 
                             mass=0, 
                             color=[0, 0, 1, 0.95])
@@ -378,6 +379,10 @@ class NavigateEnv(BaseEnv):
 
         additional_states = np.append(additional_states, [linear_velocity, angular_velocity])
 
+        self.robots[0].calc_state()
+        additional_states = np.append(additional_states, np.sin(self.robots[0].joint_position[2]))
+        additional_states = np.append(additional_states, np.cos(self.robots[0].joint_position[2]))
+
         if self.config['task'] == 'reaching':
             # End-effector
             end_effector_pos_local = self.global_to_local(self.robots[0].get_end_effector_position())
@@ -394,7 +399,7 @@ class NavigateEnv(BaseEnv):
             additional_states = np.append(additional_states, np.sin(self.robots[0].joint_position[2:]))
             additional_states = np.append(additional_states, np.cos(self.robots[0].joint_position[2:]))
             additional_states = np.append(additional_states, self.robots[0].joint_velocity[2:])
-            #additional_states = np.append(additional_states, self.robots[0].joint_torque)
+            #additional_states = np.append(additional_states, self.robots[0].joint_torque
 
         assert additional_states.shape[0] == self.additional_states_dim, \
             'additional states dimension mismatch {} v.s. {}'.format(additional_states.shape[0], self.additional_states_dim)
@@ -766,7 +771,11 @@ class NavigateEnv(BaseEnv):
             obj_1[1] += 0.02
 
         obj_1[0] = 1.5
-        obj_1[2] = 0.075
+
+        if self.option == 0: 
+            obj_1[2] = 0.075
+        else: 
+            obj_1[2] = 1.2
 
         if obj_2[1] > 0.7 and not self.go_left_2: 
             self.go_left_2 = True
@@ -774,12 +783,16 @@ class NavigateEnv(BaseEnv):
             self.go_left_2 = False 
 
         if self.go_left_2:
-            obj_2[1] += -0.015
+            obj_2[1] += -0.02
         elif not self.go_left_2: 
-            obj_2[1] += 0.015
+            obj_2[1] += 0.02
 
         obj_2[0] = 3.0
-        obj_2[2] = 1.2
+
+        if self.option == 0: 
+            obj_2[2] = 1.2
+        else: 
+            obj_2[2] = 0.075
 
         self.obstacles[0].set_position_orientation(obj_1, [0, 0, 0, 1])
         self.obstacles[1].set_position_orientation(obj_2, [0, 0, 0, 1])
@@ -988,8 +1001,17 @@ class NavigateEnv(BaseEnv):
         self.reset_variables()
         self.step_visualization()
 
-        self.obstacles[0].set_position_orientation([1.5, np.random.uniform(-0.7,0.7) ,0.075], [0, 0, 0, 1])
-        self.obstacles[0].set_position_orientation([3.0, np.random.uniform(-0.7,0.7) ,1.2], [0, 0, 0, 1])
+        self.go_left_1 = np.random.choice([0,1])
+        self.go_left_2 = np.random.choice([0,1])
+        self.option = np.random.choice([0,1])
+
+        if self.option == 0: 
+            self.obstacles[0].set_position_orientation([1.5, np.random.uniform(-0.7,0.7) ,0.075], [0, 0, 0, 1])
+            self.obstacles[1].set_position_orientation([3.0, np.random.uniform(-0.7,0.7) ,1.2], [0, 0, 0, 1])
+
+        else: 
+            self.obstacles[0].set_position_orientation([1.5, np.random.uniform(-0.7,0.7) ,1.2], [0, 0, 0, 1])
+            self.obstacles[1].set_position_orientation([3.0, np.random.uniform(-0.7,0.7) ,0.075], [0, 0, 0, 1])
 
         self.walls[0].set_position_orientation([-2.0, 0, 1.0], [0, 0, 0, 1])
         self.walls[1].set_position_orientation([8.0, 0, 1.0], [0, 0, 0, 1])
