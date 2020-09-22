@@ -118,7 +118,11 @@ class LocomotorRobot(BaseRobot):
             j.set_motor_velocity(0.0)
 
     def apply_robot_action(self, action):
-        action = np.append(action,[0])
+        # Check if the dim of the action space is less than the number of movable joints. 
+        # If so, append zeroes to the end of the action. 
+        if action.size < len(self.ordered_joints): 
+            action = np.append(action,[0]*(len(self.ordered_joints) - action.size))
+
         if self.control == 'torque':
             for n, j in enumerate(self.ordered_joints):
                 j.set_motor_torque(self.torque_coef * j.max_torque * float(np.clip(action[n], -1, +1)))
@@ -763,7 +767,8 @@ class JR2_Kinova_Head(LocomotorRobot):
     # initialize JR's arm to almost the same height as the door handle to ease exploration
     def robot_specific_reset(self):
         super(JR2_Kinova_Head, self).robot_specific_reset()
-        self.ordered_joints[2].reset_joint_state(0.52, 0.0)
+        self.ordered_joints[2].reset_joint_state(0.0, 0.0)
+        self.ordered_joints[3].reset_joint_state(0.52, 0.0)
         #self.ordered_joints[3].reset_joint_state(np.random.uniform(-3.0*np.pi/4.0, -np.pi/2.0), 0.0)
         #self.ordered_joints[4].reset_joint_state(np.random.uniform(np.pi/4.0, 3.0*np.pi/4.0), 0.0)
         #self.ordered_joints[5].reset_joint_state(np.random.uniform(np.pi/4.0, 3.0*np.pi/4.0), 0.0)

@@ -27,8 +27,8 @@ class Viewer:
         cv2.namedWindow('ExternalView')
         cv2.moveWindow("ExternalView", 0,0)
         cv2.namedWindow('RGB')
-        cv2.namedWindow('SEG')
-        cv2.namedWindow('DEPTH')
+        #cv2.namedWindow('SEG')
+        #cv2.namedWindow('DEPTH')
         cv2.setMouseCallback('ExternalView', self.change_dir)
 
     def change_dir(self, event, x, y, flags, param):
@@ -126,6 +126,7 @@ class Viewer:
 
             rgb = self.renderer.render_robot_cameras(modes=('rgb'))
 
+            '''
             seg = self.renderer.render_robot_cameras(modes=('seg'))[0][:, :, 0:1]
             seg = np.clip(seg * 255.0 / 5, 0.0, 1.0)
 
@@ -146,10 +147,10 @@ class Viewer:
 
             # re-scale depth to [0.0, 1.0]
             depth /= 5.0
-            
+            '''
             cv2.imshow('RGB', cv2.cvtColor(np.concatenate(rgb, axis=1), cv2.COLOR_RGB2BGR))
-            cv2.imshow('SEG', cv2.flip(cv2.rotate(cv2.cvtColor(np.concatenate(seg, axis=1), cv2.COLOR_RGB2BGR), cv2.ROTATE_90_CLOCKWISE),1))
-            cv2.imshow('DEPTH', cv2.flip(cv2.rotate(cv2.cvtColor(np.concatenate(depth, axis=1), cv2.COLOR_RGB2BGR),cv2.ROTATE_90_CLOCKWISE),1))
+            #cv2.imshow('SEG', cv2.flip(cv2.rotate(cv2.cvtColor(np.concatenate(seg, axis=1), cv2.COLOR_RGB2BGR), cv2.ROTATE_90_CLOCKWISE),1))
+            #cv2.imshow('DEPTH', cv2.flip(cv2.rotate(cv2.cvtColor(np.concatenate(depth, axis=1), cv2.COLOR_RGB2BGR),cv2.ROTATE_90_CLOCKWISE),1))
 
 
 if __name__ == '__main__':

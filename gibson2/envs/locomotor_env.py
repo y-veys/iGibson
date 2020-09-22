@@ -379,9 +379,9 @@ class NavigateEnv(BaseEnv):
 
         additional_states = np.append(additional_states, [linear_velocity, angular_velocity])
 
-        self.robots[0].calc_state()
-        additional_states = np.append(additional_states, np.sin(self.robots[0].joint_position[2]))
-        additional_states = np.append(additional_states, np.cos(self.robots[0].joint_position[2]))
+        #self.robots[0].calc_state()
+        #additional_states = np.append(additional_states, np.sin(self.robots[0].joint_position[2]))
+        #additional_states = np.append(additional_states, np.cos(self.robots[0].joint_position[2]))
 
         if self.config['task'] == 'reaching':
             # End-effector
@@ -855,14 +855,42 @@ class NavigateEnv(BaseEnv):
         If the index is 2, set it to most downwards position. Otherwise, it should be in the center. 
         """
         if camera_mask_indices[0] == 0: 
-            self.robots[0].ordered_joints[2].reset_joint_state(-0.52, 0.0)
+            self.robots[0].ordered_joints[2].reset_joint_state(0.0, 0.0)
+            self.robots[0].ordered_joints[3].reset_joint_state(-0.52, 0.0)
 
         elif camera_mask_indices[0] == 2: 
+            self.robots[0].ordered_joints[2].reset_joint_state(0.0, 0.0)
+            self.robots[0].ordered_joints[3].reset_joint_state(0.52, 0.0)
+
+        elif camera_mask_indices[0] == 3: 
             self.robots[0].ordered_joints[2].reset_joint_state(0.52, 0.0)
+            self.robots[0].ordered_joints[3].reset_joint_state(-0.52, 0.0)
+
+        elif camera_mask_indices[0] == 4: 
+            self.robots[0].ordered_joints[2].reset_joint_state(0.52, 0.0)
+            self.robots[0].ordered_joints[3].reset_joint_state(0.0, 0.0)
+
+        elif camera_mask_indices[0] == 5: 
+            self.robots[0].ordered_joints[2].reset_joint_state(0.52, 0.0)
+            self.robots[0].ordered_joints[3].reset_joint_state(0.52, 0.0)
+
+        elif camera_mask_indices[0] == 6: 
+            self.robots[0].ordered_joints[2].reset_joint_state(-0.52, 0.0)
+            self.robots[0].ordered_joints[3].reset_joint_state(-0.52, 0.0)
+
+        elif camera_mask_indices[0] == 7: 
+            self.robots[0].ordered_joints[2].reset_joint_state(-0.52, 0.0)
+            self.robots[0].ordered_joints[3].reset_joint_state(0.0, 0.0)
+
+        elif camera_mask_indices[0] == 8: 
+            self.robots[0].ordered_joints[2].reset_joint_state(-0.52, 0.0)
+            self.robots[0].ordered_joints[3].reset_joint_state(0.52, 0.0)
 
         else: 
             self.robots[0].ordered_joints[2].reset_joint_state(0.0, 0.0)
+            self.robots[0].ordered_joints[3].reset_joint_state(0.0, 0.0)
 
+    
     def reset_agent(self):
         """
         Reset the robot's joint configuration and base pose until no collision
@@ -1004,6 +1032,7 @@ class NavigateEnv(BaseEnv):
         self.go_left_1 = np.random.choice([0,1])
         self.go_left_2 = np.random.choice([0,1])
         self.option = np.random.choice([0,1])
+        #self.option = 0
 
         if self.option == 0: 
             self.obstacles[0].set_position_orientation([1.5, np.random.uniform(-0.7,0.7) ,0.075], [0, 0, 0, 1])
