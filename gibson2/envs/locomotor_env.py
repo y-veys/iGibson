@@ -97,7 +97,7 @@ class NavigateEnv(BaseEnv):
         # discount factor
         self.discount_factor = self.config.get('discount_factor', 0.99)
 
-        self.num_obstacles = 3
+        self.num_obstacles = 2
         self.obstacles = []
         self.obs_dir = []
         self.obs_positions = []
@@ -257,7 +257,7 @@ class NavigateEnv(BaseEnv):
 
         for i in range(self.num_obstacles): 
 
-            obstacle = BoxShape(dim=[0.075, 0.75, 0.075], 
+            obstacle = BoxShape(dim=[0.075, 0.6, 0.075], 
                                 visual_only=False, 
                                 mass=0, 
                                 color=[1, 1, 0, 0.95])
