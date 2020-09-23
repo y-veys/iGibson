@@ -114,6 +114,8 @@ class Viewer:
             self.py += 0.05
         elif q == ord('d'):
             self.py -= 0.05
+        elif q == ord('e'):
+            self.pz += 0.05
         elif q == ord('q'):
             exit()
 

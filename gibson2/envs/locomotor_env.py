@@ -102,7 +102,7 @@ class NavigateEnv(BaseEnv):
         self.go_left_2 = np.random.choice([0,1])
         self.option = np.random.choice([0,1])
 
-        self.num_obstacles = 1
+        self.num_obstacles = 2
 
         self.reset_step = 25
         self.walls = []
@@ -374,9 +374,9 @@ class NavigateEnv(BaseEnv):
 
         additional_states = np.append(additional_states, [linear_velocity, angular_velocity])
 
-        #self.robots[0].calc_state()
-        #additional_states = np.append(additional_states, np.sin(self.robots[0].joint_position[2]))
-        #additional_states = np.append(additional_states, np.cos(self.robots[0].joint_position[2]))
+        self.robots[0].calc_state()
+        additional_states = np.append(additional_states, np.sin(self.robots[0].joint_position[2]))
+        additional_states = np.append(additional_states, np.cos(self.robots[0].joint_position[2]))
 
         if self.config['task'] == 'reaching':
             # End-effector
@@ -1030,8 +1030,8 @@ class NavigateEnv(BaseEnv):
 
         self.go_left_1 = np.random.choice([0,1])
         self.go_left_2 = np.random.choice([0,1])
-        #self.option = np.random.choice([0,1])
-        self.option = 0
+        self.option = np.random.choice([0,1])
+        #self.option = 0
 
         if self.option == 0: 
             self.obstacles[0].set_position_orientation([1.5, np.random.uniform(-0.7,0.7) ,0.075], [0, 0, 0, 1])
