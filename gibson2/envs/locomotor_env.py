@@ -79,7 +79,7 @@ class NavigateEnv(BaseEnv):
 
         # reward
         self.reward_type = self.config.get('reward_type', 'l2')
-        assert self.reward_type in ['geodesic', 'l2', 'sparse', 'pixel']
+        assert self.reward_type in ['geodesic', 'l2', 'sparse']
 
         self.success_reward = self.config.get('success_reward', 10.0)
         self.slack_reward = self.config.get('slack_reward', -0.01)
@@ -87,7 +87,6 @@ class NavigateEnv(BaseEnv):
         # reward weight
         self.potential_reward_weight = self.config.get('potential_reward_weight', 1.0)
         self.collision_reward_weight = self.config.get('collision_reward_weight', -0.1)
-        self.focus_reward_weight = self.config.get('focus_reward_weight', 1.0)
 
         # ignore the agent's collision with these body ids
         self.collision_ignore_body_b_ids = set(self.config.get('collision_ignore_body_b_ids', []))
@@ -97,12 +96,11 @@ class NavigateEnv(BaseEnv):
         # discount factor
         self.discount_factor = self.config.get('discount_factor', 0.99)
 
-        self.num_obstacles = 0
+        self.num_obstacles = 0 
         self.obstacles = []
         self.obs_dir = []
         self.obs_positions = []
         
-
         self.reset_step = 25
         self.walls = []
 
@@ -273,7 +271,6 @@ class NavigateEnv(BaseEnv):
                 self.target_pos_vis_obj.load()
                 #self.target_pos_vis_obj_exact.load()
 
-
     def load_obstacles(self):
 
         for i in range(self.num_obstacles): 
@@ -329,7 +326,6 @@ class NavigateEnv(BaseEnv):
         self.walls.append(left_wall)
         self.walls.append(right_wall)
 
-
     def load_miscellaneous_variables(self):
         """
         Load miscellaneous variables for book keeping
@@ -349,7 +345,7 @@ class NavigateEnv(BaseEnv):
         self.load_action_space()
         self.load_visualization()
         self.load_obstacles()
-        self.load_walls()
+        #self.load_walls()
         self.load_miscellaneous_variables()
 
     def global_to_local(self, pos):
@@ -383,8 +379,8 @@ class NavigateEnv(BaseEnv):
         additional_states = np.append(additional_states, [linear_velocity, angular_velocity])
 
         self.robots[0].calc_state()
-        additional_states = np.append(additional_states, np.sin(self.robots[0].joint_position[2]))
-        additional_states = np.append(additional_states, np.cos(self.robots[0].joint_position[2]))
+        additional_states = np.append(additional_states, np.sin(self.robots[0].joint_position[7]))
+        additional_states = np.append(additional_states, np.cos(self.robots[0].joint_position[7]))
 
         if self.config['task'] == 'reaching':
             # End-effector
@@ -399,9 +395,9 @@ class NavigateEnv(BaseEnv):
 
             # Joint positions and velocities 
             self.robots[0].calc_state()
-            additional_states = np.append(additional_states, np.sin(self.robots[0].joint_position[2:]))
-            additional_states = np.append(additional_states, np.cos(self.robots[0].joint_position[2:]))
-            additional_states = np.append(additional_states, self.robots[0].joint_velocity[2:])
+            additional_states = np.append(additional_states, np.sin(self.robots[0].joint_position[2:7]))
+            additional_states = np.append(additional_states, np.cos(self.robots[0].joint_position[2:7]))
+            additional_states = np.append(additional_states, self.robots[0].joint_velocity[2:7])
             #additional_states = np.append(additional_states, self.robots[0].joint_torque
 
         assert additional_states.shape[0] == self.additional_states_dim, \
@@ -491,14 +487,12 @@ class NavigateEnv(BaseEnv):
         """
         :return: RGB sensor reading, normalized to [0.0, 1.0]
         """
-
         return self.simulator.renderer.render_robot_cameras(modes=('rgb'))[0][:, :, :3]
 
     def get_wrist_rgb(self):
         """
         :return: wrist cam RGB sensor reading, normalized to [0.0, 1.0]
         """
-
         return self.simulator.renderer.render_robot_cameras(modes=('rgb'))[1][:, :, :3]
 
     def get_pc(self):
@@ -612,7 +606,6 @@ class NavigateEnv(BaseEnv):
             collision_links.append(list(p.getContactPoints(bodyA=self.robots[0].robot_ids[0])))
         self.simulator.sync()
 
-
         return self.filter_collision_links(collision_links)
 
     def filter_collision_links(self, collision_links):
@@ -639,7 +632,6 @@ class NavigateEnv(BaseEnv):
 
                 new_collision_per_sim_step.append(item)
             new_collision_links.append(new_collision_per_sim_step)
-
         return new_collision_links
 
     def get_position_of_interest(self):
@@ -651,19 +643,6 @@ class NavigateEnv(BaseEnv):
             return self.robots[0].get_position()
         elif self.config['task'] == 'reaching':
             return self.robots[0].get_end_effector_position()
-        elif self.config['task'] == 'focus':
-            return self.get_goal_center()
-    
-    def get_goal_center(self):
-        seg = self.get_seg()
-        (x_avg, y_avg) = (np.mean(np.where(seg==1)[0]), np.mean(np.where(seg==1)[1]))
-
-        if (not np.isnan(x_avg) and not np.isnan(y_avg)):
-            return [int(round(x_avg)), int(round(y_avg))]
-
-        else:
-            return [0,0]
-
 
     def get_shortest_path(self, from_initial_pos=False, entire_path=False):
         """
@@ -691,17 +670,8 @@ class NavigateEnv(BaseEnv):
         """
         return l2_distance(self.target_pos, self.get_position_of_interest())
 
-    def get_pixel_potential(self):
-        """
-        :return: L2 distance between middle of image and current 
-        """
-        return l2_distance([self.image_width/2, self.image_height/2], self.get_goal_center())
-
     def is_goal_reached(self):
-        if self.reward_type == 'pixel':
-            return l2_distance([self.image_width/2, self.image_height/2], self.get_position_of_interest()) < self.dist_tol
-        else:
-            return l2_distance(self.get_position_of_interest(), self.target_pos) < self.dist_tol
+        return l2_distance(self.get_position_of_interest(), self.target_pos) < self.dist_tol
 
     def get_reward(self, collision_links=[], action=None, info={}):
         """
@@ -714,12 +684,9 @@ class NavigateEnv(BaseEnv):
         reward = self.slack_reward  # |slack_reward| = 0.01 per step
 
         if self.reward_type == 'l2':
-            new_potential = self.get_l2_potential() 
+            new_potential = self.get_l2_potential()
         elif self.reward_type == 'geodesic':
             new_potential = self.get_geodesic_potential()
-        elif self.reward_type == 'pixel':
-            new_potential = self.get_pixel_potential()
-
         potential_reward = self.potential - new_potential
         reward += potential_reward * self.potential_reward_weight  # |potential_reward| ~= 0.1 per step
         self.potential = new_potential
@@ -728,13 +695,8 @@ class NavigateEnv(BaseEnv):
         self.collision_step += int(collision_reward)
         reward += collision_reward * self.collision_reward_weight  # |collision_reward| ~= 1.0 per step if collision
 
-        #focus_reward = self.focus_potential - self.get_pixel_potential()
-        #reward += focus_reward * self.focus_reward_weight
-
         if self.is_goal_reached():
             reward += self.success_reward  # |success_reward| = 10.0 per step
-            #print("SUCCESS")
-            #print(self.get_l2_potential())
         return reward, info
 
     def get_termination(self, collision_links=[], action=None, info={}):
@@ -851,7 +813,6 @@ class NavigateEnv(BaseEnv):
 
         self.obstacles[0].set_position_orientation(curr_obj_pos, [0, 0, 0, 1])
         '''
-        
 
     def step(self, action):
         """
@@ -876,6 +837,7 @@ class NavigateEnv(BaseEnv):
             info['last_observation'] = state
             state = self.reset()
         return state, reward, done, info
+
 
     def set_camera(self, camera_mask_indices):
         """
@@ -918,7 +880,6 @@ class NavigateEnv(BaseEnv):
             self.robots[0].ordered_joints[7].reset_joint_state(0.0, 0.0)
             self.robots[0].ordered_joints[8].reset_joint_state(0.0, 0.0)
 
-    
     def reset_agent(self):
         """
         Reset the robot's joint configuration and base pose until no collision
@@ -1049,12 +1010,10 @@ class NavigateEnv(BaseEnv):
         state = self.get_state()
         if self.reward_type == 'l2':
             self.potential = self.get_l2_potential()
-            self.focus_potential = self.get_pixel_potential()
         elif self.reward_type == 'geodesic':
             self.potential = self.get_geodesic_potential()
-        elif self.reward_type == 'pixel':
-            self.potential = self.get_pixel_potential()
         self.reset_variables()
+        self.step_visualization()
 
         self.obs_dir = [np.random.choice([0,1]) for i in range(self.num_obstacles)]
         self.obs_positions = [[2.0*(i+1), np.random.uniform(-0.7,0.7), np.random.choice([1.2,0.075])] for i in range(self.num_obstacles)]
@@ -1062,12 +1021,10 @@ class NavigateEnv(BaseEnv):
         for i in range(self.num_obstacles):
             self.obstacles[i].set_position_orientation(self.obs_positions[i], [0,0,0,1])
 
-        self.walls[0].set_position_orientation([-2.0, 0, 1.0], [0, 0, 0, 1])
-        self.walls[1].set_position_orientation([8.0, 0, 1.0], [0, 0, 0, 1])
-        self.walls[2].set_position_orientation([3.0, 1.6, 1.0], [0, 0, 0, 1])
-        self.walls[3].set_position_orientation([3.0, -1.6, 1.0], [0, 0, 0, 1])
-
-        self.step_visualization()
+        #self.walls[0].set_position_orientation([-2.0, 0, 1.0], [0, 0, 0, 1])
+        #self.walls[1].set_position_orientation([8.0, 0, 1.0], [0, 0, 0, 1])
+        #self.walls[2].set_position_orientation([3.0, 1.6, 1.0], [0, 0, 0, 1])
+        #self.walls[3].set_position_orientation([3.0, -1.6, 1.0], [0, 0, 0, 1])
 
         return state
 
@@ -1215,6 +1172,7 @@ class NavigateRandomHeightEnv(NavigateEnv):
 
         state = super(NavigateRandomHeightEnv, self).reset()
         return state
+
 
 class NavigateRandomEnvSim2Real(NavigateRandomEnv):
     def __init__(self,
@@ -1375,11 +1333,11 @@ if __name__ == '__main__':
     parser.add_argument('--mode',
                         '-m',
                         choices=['headless', 'gui'],
-                        default='pbgui',
+                        default='headless',
                         help='which mode for simulation (default: headless)')
     parser.add_argument('--env_type',
                         choices=['deterministic', 'random', 'sim2real'],
-                        default='random',
+                        default='deterministic',
                         help='which environment type (deterministic | random | sim2real)')
     parser.add_argument('--sim2real_track',
                         choices=['static', 'interactive', 'dynamic'],

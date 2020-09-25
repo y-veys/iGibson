@@ -70,7 +70,8 @@ class BaseRobot:
         assert "eyes" in self.parts, 'Please add a link named "eyes" in your robot URDF file with the same pose as the onboard camera. Feel free to check out assets/models/turtlebot/turtlebot.urdf for an example.'
         self.eyes = self.parts["eyes"]
 
-        self.wrist_eyes = self.parts["wrist_eyes"]
+        if "wrist_eyes" in self.parts: 
+            self.wrist_eyes = self.parts["wrist_eyes"]
 
         return self.robot_ids
 

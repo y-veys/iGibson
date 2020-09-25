@@ -15,7 +15,7 @@ target_pos: [6.0, 0.0, 0.0]
 target_orn: [0.0, 0.0, 0.0]
 
 is_discrete: false
-additional_states_dim: 6
+additional_states_dim: 4
 goal_dim: 0
 
 reward_type: l2
@@ -32,7 +32,7 @@ discount_factor: 0.99
 dist_tol: 0.06
 max_step: 100
 
-output: [sensor, rgb]
+output: [sensor]
 resolution: 256
 vertical_fov: 60
 
