@@ -97,7 +97,7 @@ class NavigateEnv(BaseEnv):
         # discount factor
         self.discount_factor = self.config.get('discount_factor', 0.99)
 
-        self.num_obstacles = 2
+        self.num_obstacles = 0
         self.obstacles = []
         self.obs_dir = []
         self.obs_positions = []
@@ -134,6 +134,12 @@ class NavigateEnv(BaseEnv):
                                             shape=(self.image_height, self.image_width, 3),
                                             dtype=np.float32)
             observation_space['rgb'] = self.rgb_space
+        if 'wrist_rgb' in self.output: 
+            self.wrist_rgb_space = gym.spaces.Box(low=0.0,
+                                            high=1.0,
+                                            shape=(self.image_height, self.image_width, 3),
+                                            dtype=np.float32)
+            observation_space['wrist_rgb'] = self.wrist_rgb_space
         if 'depth' in self.output:
             self.depth_noise_rate = self.config.get('depth_noise_rate', 0.0)
             self.depth_low = self.config.get('depth_low', 0.0)
@@ -143,6 +149,12 @@ class NavigateEnv(BaseEnv):
                                               shape=(self.image_height, self.image_width, 1),
                                               dtype=np.float32)
             observation_space['depth'] = self.depth_space
+        if 'wrist_depth' in self.output:
+            self.wrist_depth_space = gym.spaces.Box(low=0.0,
+                                              high=1.0,
+                                              shape=(self.image_height, self.image_width, 1),
+                                              dtype=np.float32)
+            observation_space['wrist_depth'] = self.wrist_depth_space
         if 'rgbd' in self.output:
             self.rgbd_space = gym.spaces.Box(low=0.0,
                                              high=1.0,
@@ -155,6 +167,12 @@ class NavigateEnv(BaseEnv):
                                             shape=(self.image_height, self.image_width, 1),
                                             dtype=np.float32)
             observation_space['seg'] = self.seg_space
+        if 'wrist_seg' in self.output:
+            self.wrist_seg_space = gym.spaces.Box(low=0.0,
+                                            high=1.0,
+                                            shape=(self.image_height, self.image_width, 1),
+                                            dtype=np.float32)
+            observation_space['wrist_seg'] = self.wrist_seg_space
         if 'scan' in self.output:
             self.scan_noise_rate = self.config.get('scan_noise_rate', 0.0)
             self.n_horizontal_rays = self.config.get('n_horizontal_rays', 128)
@@ -344,12 +362,12 @@ class NavigateEnv(BaseEnv):
         :return: non-perception observation, such as goal location
         """
         additional_states = []
-        additional_states = self.global_to_local(self.target_pos)[:2]
-        if self.goal_format == 'polar':
-            additional_states = np.array(cartesian_to_polar(additional_states[0], additional_states[1]))
+        #additional_states = self.global_to_local(self.target_pos)[:2]
+        #if self.goal_format == 'polar':
+        #    additional_states = np.array(cartesian_to_polar(additional_states[0], additional_states[1]))
 
-        if self.config['task'] == 'reaching': 
-            additional_states = np.append(additional_states, self.target_pos[2:])
+        #if self.config['task'] == 'reaching': 
+        #    additional_states = np.append(additional_states, self.target_pos[2:])
 
         #additional_states = []
         # linear velocity along the x-axis
@@ -444,12 +462,41 @@ class NavigateEnv(BaseEnv):
 
         return depth
 
+    def get_wrist_depth(self):
+        """
+        :return: wrist cam depth sensor reading, normalized to [0.0, 1.0]
+        """
+        depth = -self.simulator.renderer.render_robot_cameras(modes=('3d'))[1][:, :, 2:3]
+        # 0.0 is a special value for invalid entries
+        depth[depth < self.depth_low] = 0.0
+        depth[depth > self.depth_high] = self.depth_high
+
+        # re-scale depth to [0.0, 1.0]
+        depth /= self.depth_high
+        depth = self.add_naive_noise_to_sensor(depth, self.depth_noise_rate, noise_value=0.0)
+
+        #if np.isnan(depth).any():
+        #    print("Has Nan")
+        #    depth = np.nan_to_num(depth)
+
+        #elif not np.isnan(depth).any():
+        #    print("Doesn't have Nan's")
+
+        return depth
+
     def get_rgb(self):
         """
         :return: RGB sensor reading, normalized to [0.0, 1.0]
         """
 
         return self.simulator.renderer.render_robot_cameras(modes=('rgb'))[0][:, :, :3]
+
+    def get_wrist_rgb(self):
+        """
+        :return: wrist cam RGB sensor reading, normalized to [0.0, 1.0]
+        """
+
+        return self.simulator.renderer.render_robot_cameras(modes=('rgb'))[1][:, :, :3]
 
     def get_pc(self):
         """
@@ -471,7 +518,19 @@ class NavigateEnv(BaseEnv):
         #if self.num_object_classes is not None:
         #    seg = np.clip(seg * 255.0 / self.num_object_classes, 0.0, 1.0)
 
-        seg = np.clip(seg * 255.0 / 4, 0.0, 1.0)
+        seg = np.clip(seg * 255.0 / 3, 0.0, 1.0)
+
+        return seg
+
+    def get_wrist_seg(self):
+        """
+        :return: wrist cam semantic segmentation mask, normalized to [0.0, 1.0]
+        """
+        seg = self.simulator.renderer.render_robot_cameras(modes='seg')[1][:, :, 0:1]
+        #if self.num_object_classes is not None:
+        #    seg = np.clip(seg * 255.0 / self.num_object_classes, 0.0, 1.0)
+
+        seg = np.clip(seg * 255.0 / 3, 0.0, 1.0)
 
         return seg
 
@@ -512,8 +571,12 @@ class NavigateEnv(BaseEnv):
             state['goal'] = self.get_goal()
         if 'rgb' in self.output:
             state['rgb'] = self.get_rgb()
+        if 'wrist_rgb' in self.output:
+            state['wrist_rgb'] = self.get_wrist_rgb()
         if 'depth' in self.output:
             state['depth'] = self.get_depth()
+        if 'wrist_depth' in self.output:
+            state['wrist_depth'] = self.get_wrist_depth()
         if 'pc' in self.output:
             state['pc'] = self.get_pc()
         if 'rgbd' in self.output:
@@ -524,6 +587,8 @@ class NavigateEnv(BaseEnv):
             state['normal'] = self.get_normal()
         if 'seg' in self.output:
             state['seg'] = self.get_seg()
+        if 'wrist_seg' in self.output:
+            state['wrist_seg'] = self.get_wrist_seg()
         if 'rgb_filled' in self.output:
             with torch.no_grad():
                 tensor = transforms.ToTensor()((state['rgb'] * 255).astype(np.uint8)).cuda()
@@ -815,40 +880,40 @@ class NavigateEnv(BaseEnv):
         If the index is 2, set it to most downwards position. Otherwise, it should be in the center. 
         """
         if camera_mask_indices[0] == 0: 
-            self.robots[0].ordered_joints[2].reset_joint_state(0.0, 0.0)
-            self.robots[0].ordered_joints[3].reset_joint_state(-0.52, 0.0)
+            self.robots[0].ordered_joints[7].reset_joint_state(0.0, 0.0)
+            self.robots[0].ordered_joints[8].reset_joint_state(-0.52, 0.0)
 
         elif camera_mask_indices[0] == 2: 
-            self.robots[0].ordered_joints[2].reset_joint_state(0.0, 0.0)
-            self.robots[0].ordered_joints[3].reset_joint_state(0.52, 0.0)
+            self.robots[0].ordered_joints[7].reset_joint_state(0.0, 0.0)
+            self.robots[0].ordered_joints[8].reset_joint_state(0.52, 0.0)
 
         elif camera_mask_indices[0] == 3: 
-            self.robots[0].ordered_joints[2].reset_joint_state(0.52, 0.0)
-            self.robots[0].ordered_joints[3].reset_joint_state(-0.52, 0.0)
+            self.robots[0].ordered_joints[7].reset_joint_state(0.52, 0.0)
+            self.robots[0].ordered_joints[8].reset_joint_state(-0.52, 0.0)
 
         elif camera_mask_indices[0] == 4: 
-            self.robots[0].ordered_joints[2].reset_joint_state(0.52, 0.0)
-            self.robots[0].ordered_joints[3].reset_joint_state(0.0, 0.0)
+            self.robots[0].ordered_joints[7].reset_joint_state(0.52, 0.0)
+            self.robots[0].ordered_joints[8].reset_joint_state(0.0, 0.0)
 
         elif camera_mask_indices[0] == 5: 
-            self.robots[0].ordered_joints[2].reset_joint_state(0.52, 0.0)
-            self.robots[0].ordered_joints[3].reset_joint_state(0.52, 0.0)
+            self.robots[0].ordered_joints[7].reset_joint_state(0.52, 0.0)
+            self.robots[0].ordered_joints[8].reset_joint_state(0.52, 0.0)
 
         elif camera_mask_indices[0] == 6: 
-            self.robots[0].ordered_joints[2].reset_joint_state(-0.52, 0.0)
-            self.robots[0].ordered_joints[3].reset_joint_state(-0.52, 0.0)
+            self.robots[0].ordered_joints[7].reset_joint_state(-0.52, 0.0)
+            self.robots[0].ordered_joints[8].reset_joint_state(-0.52, 0.0)
 
         elif camera_mask_indices[0] == 7: 
-            self.robots[0].ordered_joints[2].reset_joint_state(-0.52, 0.0)
-            self.robots[0].ordered_joints[3].reset_joint_state(0.0, 0.0)
+            self.robots[0].ordered_joints[7].reset_joint_state(-0.52, 0.0)
+            self.robots[0].ordered_joints[8].reset_joint_state(0.0, 0.0)
 
         elif camera_mask_indices[0] == 8: 
-            self.robots[0].ordered_joints[2].reset_joint_state(-0.52, 0.0)
-            self.robots[0].ordered_joints[3].reset_joint_state(0.52, 0.0)
+            self.robots[0].ordered_joints[7].reset_joint_state(-0.52, 0.0)
+            self.robots[0].ordered_joints[8].reset_joint_state(0.52, 0.0)
 
         else: 
-            self.robots[0].ordered_joints[2].reset_joint_state(0.0, 0.0)
-            self.robots[0].ordered_joints[3].reset_joint_state(0.0, 0.0)
+            self.robots[0].ordered_joints[7].reset_joint_state(0.0, 0.0)
+            self.robots[0].ordered_joints[8].reset_joint_state(0.0, 0.0)
 
     
     def reset_agent(self):
@@ -989,7 +1054,7 @@ class NavigateEnv(BaseEnv):
         self.reset_variables()
 
         self.obs_dir = [np.random.choice([0,1]) for i in range(self.num_obstacles)]
-        self.obs_positions = [[1.5*(i+1), np.random.uniform(-0.7,0.7), np.random.choice([1.2,0.075])] for i in range(self.num_obstacles)]
+        self.obs_positions = [[2.0*(i+1), np.random.uniform(-0.7,0.7), np.random.choice([1.2,0.075])] for i in range(self.num_obstacles)]
 
         for i in range(self.num_obstacles):
             self.obstacles[i].set_position_orientation(self.obs_positions[i], [0,0,0,1])
@@ -1068,9 +1133,8 @@ class NavigateRandomEnv(NavigateEnv):
         self.target_orn = np.array(self.config.get('target_orn', [0, 0, 0]))
 
         self.target_pos[0] = np.random.uniform(5.5, 6.0)
-        self.target_pos[1] = np.random.uniform(-0.75, 0.75)
-        #self.target_pos[2] = np.random.uniform(0.5, 1.0)
-        self.target_pos[2] = 0
+        self.target_pos[1] = np.random.uniform(-0.5, 0.5)
+        self.target_pos[2] = np.random.uniform(0.5, 1.0)
 
     def reset(self):
         """

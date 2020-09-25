@@ -40,6 +40,8 @@ class BaseRobot:
         self.physics_model_dir = os.path.join(gibson2.assets_path, "models")
         self.scale = scale
         self.eyes = None
+        self.wrist_eyes = None
+
         logging.info('Loading robot model file: {}'.format(self.model_file))
         if self.model_file[-4:] == 'urdf':
             self.model_type = 'URDF'
@@ -67,6 +69,8 @@ class BaseRobot:
 
         assert "eyes" in self.parts, 'Please add a link named "eyes" in your robot URDF file with the same pose as the onboard camera. Feel free to check out assets/models/turtlebot/turtlebot.urdf for an example.'
         self.eyes = self.parts["eyes"]
+
+        self.wrist_eyes = self.parts["wrist_eyes"]
 
         return self.robot_ids
 

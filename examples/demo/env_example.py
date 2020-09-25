@@ -10,13 +10,12 @@ from gibson2.core.render.profiler import Profiler
 def main():
     config_filename = os.path.join(os.path.dirname(gibson2.__file__),
                                    '../examples/configs/jr2_reaching.yaml')
-    nav_env = NavigateEnv(config_file=config_filename, mode='gui')
+    nav_env = NavigateEnv(config_file=config_filename, mode='pbgui')
     for j in range(100):
         nav_env.reset()
         for i in range(1000):
             with Profiler('Env action step'):
                 action = nav_env.action_space.sample()
-                action = [0,0]
                 state, reward, done, info = nav_env.step(action)
                 #nav_env.set_camera([np.random.choice([0,1,2,3,4,5,6,7,8])])
                 if done:

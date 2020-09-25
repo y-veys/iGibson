@@ -740,10 +740,10 @@ class JR2_Kinova_Head(LocomotorRobot):
         self.head_velocity = config.get('head_velocity', 0.05)
         self.head_dim = 0
         self.arm_velocity = config.get('arm_velocity', 1.0)
-        self.arm_dim = 0
+        self.arm_dim = 5
 
         LocomotorRobot.__init__(self,
-                                "jr2_urdf/jr2_head.urdf",
+                                "jr2_urdf/jr2_kinova_double_cam.urdf",
                                 action_dim=self.wheel_dim + self.head_dim + self.arm_dim, 
                                 scale=config.get("robot_scale", 1.0),
                                 is_discrete=config.get("is_discrete", False),
@@ -767,13 +767,13 @@ class JR2_Kinova_Head(LocomotorRobot):
     # initialize JR's arm to almost the same height as the door handle to ease exploration
     def robot_specific_reset(self):
         super(JR2_Kinova_Head, self).robot_specific_reset()
-        self.ordered_joints[2].reset_joint_state(0.0, 0.0)
-        self.ordered_joints[3].reset_joint_state(0.52, 0.0)
-        #self.ordered_joints[3].reset_joint_state(np.random.uniform(-3.0*np.pi/4.0, -np.pi/2.0), 0.0)
-        #self.ordered_joints[4].reset_joint_state(np.random.uniform(np.pi/4.0, 3.0*np.pi/4.0), 0.0)
-        #self.ordered_joints[5].reset_joint_state(np.random.uniform(np.pi/4.0, 3.0*np.pi/4.0), 0.0)
-        #self.ordered_joints[6].reset_joint_state(np.pi / 2.0, 0.0)
-        #self.ordered_joints[7].reset_joint_state(0.0, 0.0)
+        self.ordered_joints[2].reset_joint_state(-np.pi/2.0, 0.0)
+        self.ordered_joints[3].reset_joint_state(np.pi/2.0, 0.0)
+        self.ordered_joints[4].reset_joint_state(np.pi/2.0, 0.0)
+        self.ordered_joints[5].reset_joint_state(np.pi/2.0, 0.0)
+        self.ordered_joints[6].reset_joint_state(0.0, 0.0)
+        self.ordered_joints[7].reset_joint_state(0.0, 0.0)
+        self.ordered_joints[8].reset_joint_state(0.52, 0.0)
 
     def load(self):
         ids = super(JR2_Kinova_Head, self).load()
@@ -785,12 +785,12 @@ class JR2_Kinova_Head(LocomotorRobot):
         #                   between jr2_fixed_body_joint and pan_joint
         #                   between jr2_fixed_body_joint and tilt_joint
         #                   between jr2_fixed_body_joint and camera_joint
-        p.setCollisionFilterPair(robot_id, robot_id, 0, 17, 0)
-        p.setCollisionFilterPair(robot_id, robot_id, 0, 18, 0)
-        p.setCollisionFilterPair(robot_id, robot_id, 0, 19, 0)
-        p.setCollisionFilterPair(robot_id, robot_id, 1, 17, 0)
-        p.setCollisionFilterPair(robot_id, robot_id, 1, 18, 0)
-        p.setCollisionFilterPair(robot_id, robot_id, 1, 19, 0)
+        p.setCollisionFilterPair(robot_id, robot_id, 0, 31, 0)
+        p.setCollisionFilterPair(robot_id, robot_id, 0, 32, 0)
+        p.setCollisionFilterPair(robot_id, robot_id, 0, 33, 0)
+        p.setCollisionFilterPair(robot_id, robot_id, 1, 31, 0)
+        p.setCollisionFilterPair(robot_id, robot_id, 1, 32, 0)
+        p.setCollisionFilterPair(robot_id, robot_id, 1, 33, 0)
 
         return ids
 

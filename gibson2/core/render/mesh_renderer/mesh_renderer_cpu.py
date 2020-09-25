@@ -764,5 +764,16 @@ class MeshRenderer(object):
                 self.set_camera(camera_pos, camera_pos + view_direction, [0, 0, 1])
                 for item in self.render(modes=modes, hidden=[instance]):
                     frames.append(item)
+
+                if instance.robot.wrist_eyes is not None: 
+                    wrist_camera_pos = instance.robot.wrist_eyes.get_position()
+                    wrist_orn = instance.robot.wrist_eyes.get_orientation()
+                    wrist_mat = quat2rotmat(xyzw2wxyz(wrist_orn))[:3, :3]
+                    wrist_view_direction = wrist_mat.dot(np.array([1, 0, 0]))
+                    self.set_camera(wrist_camera_pos, wrist_camera_pos + wrist_view_direction, [0, 0, 1])
+                    for item in self.render(modes=modes, hidden=[instance]):
+                        frames.append(item)
+
+
         return frames
 
