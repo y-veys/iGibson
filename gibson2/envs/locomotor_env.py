@@ -150,6 +150,9 @@ class NavigateEnv(BaseEnv):
                                               dtype=np.float32)
             observation_space['depth'] = self.depth_space
         if 'wrist_depth' in self.output:
+            self.depth_noise_rate = self.config.get('depth_noise_rate', 0.0)
+            self.depth_low = self.config.get('depth_low', 0.0)
+            self.depth_high = self.config.get('depth_high', 5.0)
             self.wrist_depth_space = gym.spaces.Box(low=0.0,
                                               high=1.0,
                                               shape=(self.image_height, self.image_width, 1),
