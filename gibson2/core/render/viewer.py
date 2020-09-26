@@ -129,31 +129,33 @@ class Viewer:
 
             #rgb = self.renderer.render_robot_cameras(modes=('rgb'))[0][:, :, :3]
 
-            '''
-            seg = self.renderer.render_robot_cameras(modes=('seg'))[0][:, :, 0:1]
-            seg = np.clip(seg * 255.0 / 5, 0.0, 1.0)
+            
+            seg = self.renderer.render_robot_cameras(modes=('seg'))[1][:, :, 0:1]
+            
+            seg = np.clip(seg * 255.0 / 6, 0.0, 1.0)
 
-            #all_but_goal = seg < 1 
-            #seg[all_but_goal] = 0
+            all_but_goal = seg < 1
 
-            (x_avg, y_avg) = (np.mean(np.where(seg==1)[0]), np.mean(np.where(seg==1)[1]))
+            seg[all_but_goal] = 0
 
-            if (not np.isnan(x_avg) and not np.isnan(y_avg)):
-                seg[int(round(x_avg)), int(round(y_avg))] = 0
+            #(x_avg, y_avg) = (np.mean(np.where(seg==1)[0]), np.mean(np.where(seg==1)[1]))
+
+            #if (not np.isnan(x_avg) and not np.isnan(y_avg)):
+            #    seg[int(round(x_avg)), int(round(y_avg))] = 0
 
             depth = self.renderer.render_robot_cameras(modes=('3d'))
             #print(len(depth[0]))
-            depth = -self.renderer.render_robot_cameras(modes=('3d'))[0][:, :, 2:3]
+            depth = -self.renderer.render_robot_cameras(modes=('3d'))[1][:, :, 2:3]
 
             depth[depth < 0.0] = 0.0
-            depth[depth > 5.0] = 5.0
+            depth[depth > 10.0] = 10.0
 
             # re-scale depth to [0.0, 1.0]
-            depth /= 5.0
-            '''
+            depth /= 10.0
+            
             #cv2.imshow('RGB', cv2.cvtColor(np.concatenate(rgb, axis=1), cv2.COLOR_RGB2BGR))
-            #cv2.imshow('SEG', cv2.flip(cv2.rotate(cv2.cvtColor(np.concatenate(seg, axis=1), cv2.COLOR_RGB2BGR), cv2.ROTATE_90_CLOCKWISE),1))
-            #cv2.imshow('DEPTH', cv2.flip(cv2.rotate(cv2.cvtColor(np.concatenate(depth, axis=1), cv2.COLOR_RGB2BGR),cv2.ROTATE_90_CLOCKWISE),1))
+            cv2.imshow('SEG', cv2.flip(cv2.rotate(cv2.cvtColor(np.concatenate(seg, axis=1), cv2.COLOR_RGB2BGR), cv2.ROTATE_90_CLOCKWISE),1))
+            cv2.imshow('DEPTH', cv2.flip(cv2.rotate(cv2.cvtColor(np.concatenate(depth, axis=1), cv2.COLOR_RGB2BGR),cv2.ROTATE_90_CLOCKWISE),1))
 
 
 if __name__ == '__main__':

@@ -141,7 +141,7 @@ class NavigateEnv(BaseEnv):
         if 'depth' in self.output:
             self.depth_noise_rate = self.config.get('depth_noise_rate', 0.0)
             self.depth_low = self.config.get('depth_low', 0.0)
-            self.depth_high = self.config.get('depth_high', 5.0)
+            self.depth_high = self.config.get('depth_high', 10.0)
             self.depth_space = gym.spaces.Box(low=0.0,
                                               high=1.0,
                                               shape=(self.image_height, self.image_width, 1),
@@ -150,7 +150,7 @@ class NavigateEnv(BaseEnv):
         if 'wrist_depth' in self.output:
             self.depth_noise_rate = self.config.get('depth_noise_rate', 0.0)
             self.depth_low = self.config.get('depth_low', 0.0)
-            self.depth_high = self.config.get('depth_high', 5.0)
+            self.depth_high = self.config.get('depth_high', 10.0)
             self.wrist_depth_space = gym.spaces.Box(low=0.0,
                                               high=1.0,
                                               shape=(self.image_height, self.image_width, 1),
@@ -343,9 +343,9 @@ class NavigateEnv(BaseEnv):
         self.load_task_setup()
         self.load_observation_space()
         self.load_action_space()
+        self.load_walls()
         self.load_visualization()
         self.load_obstacles()
-        #self.load_walls()
         self.load_miscellaneous_variables()
 
     def global_to_local(self, pos):
@@ -515,7 +515,11 @@ class NavigateEnv(BaseEnv):
         #if self.num_object_classes is not None:
         #    seg = np.clip(seg * 255.0 / self.num_object_classes, 0.0, 1.0)
 
-        seg = np.clip(seg * 255.0 / 3, 0.0, 1.0)
+        seg = np.clip(seg * 255.0 / 6, 0.0, 1.0)
+
+        all_but_goal = seg < 1
+
+        seg[all_but_goal] = 0
 
         return seg
 
@@ -527,7 +531,11 @@ class NavigateEnv(BaseEnv):
         #if self.num_object_classes is not None:
         #    seg = np.clip(seg * 255.0 / self.num_object_classes, 0.0, 1.0)
 
-        seg = np.clip(seg * 255.0 / 3, 0.0, 1.0)
+        seg = np.clip(seg * 255.0 / 6, 0.0, 1.0)
+
+        all_but_goal = seg < 1
+
+        seg[all_but_goal] = 0
 
         return seg
 
