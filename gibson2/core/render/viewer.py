@@ -132,11 +132,11 @@ class Viewer:
             
             seg = self.renderer.render_robot_cameras(modes=('seg'))[1][:, :, 0:1]
             
-            seg = np.clip(seg * 255.0 / 6, 0.0, 1.0)
+            seg = np.clip(seg * 255.0 / 8, 0.0, 1.0)
 
-            all_but_goal = seg < 1
+            #all_but_goal = seg < 1
 
-            seg[all_but_goal] = 0
+            #seg[all_but_goal] = 0
 
             #(x_avg, y_avg) = (np.mean(np.where(seg==1)[0]), np.mean(np.where(seg==1)[1]))
 

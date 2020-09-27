@@ -96,7 +96,7 @@ class NavigateEnv(BaseEnv):
         # discount factor
         self.discount_factor = self.config.get('discount_factor', 0.99)
 
-        self.num_obstacles = 0 
+        self.num_obstacles = 2 
         self.obstacles = []
         self.obs_dir = []
         self.obs_positions = []
@@ -344,8 +344,8 @@ class NavigateEnv(BaseEnv):
         self.load_observation_space()
         self.load_action_space()
         self.load_walls()
-        self.load_visualization()
         self.load_obstacles()
+        self.load_visualization()
         self.load_miscellaneous_variables()
 
     def global_to_local(self, pos):
@@ -515,11 +515,11 @@ class NavigateEnv(BaseEnv):
         #if self.num_object_classes is not None:
         #    seg = np.clip(seg * 255.0 / self.num_object_classes, 0.0, 1.0)
 
-        seg = np.clip(seg * 255.0 / 6, 0.0, 1.0)
+        seg = np.clip(seg * 255.0 / (6 + self.num_obstacles) , 0.0, 1.0)
 
-        all_but_goal = seg < 1
+        #all_but_goal = seg < 1
 
-        seg[all_but_goal] = 0
+        #seg[all_but_goal] = 0
 
         return seg
 
@@ -531,7 +531,7 @@ class NavigateEnv(BaseEnv):
         #if self.num_object_classes is not None:
         #    seg = np.clip(seg * 255.0 / self.num_object_classes, 0.0, 1.0)
 
-        seg = np.clip(seg * 255.0 / 6, 0.0, 1.0)
+        seg = np.clip(seg * 255.0 / (6 + self.num_obstacles) , 0.0, 1.0)
 
         all_but_goal = seg < 1
 
@@ -1021,7 +1021,6 @@ class NavigateEnv(BaseEnv):
         elif self.reward_type == 'geodesic':
             self.potential = self.get_geodesic_potential()
         self.reset_variables()
-        self.step_visualization()
 
         self.obs_dir = [np.random.choice([0,1]) for i in range(self.num_obstacles)]
         self.obs_positions = [[2.0*(i+1), np.random.uniform(-0.7,0.7), np.random.choice([1.2,0.075])] for i in range(self.num_obstacles)]
@@ -1033,6 +1032,8 @@ class NavigateEnv(BaseEnv):
         #self.walls[1].set_position_orientation([8.0, 0, 1.0], [0, 0, 0, 1])
         #self.walls[2].set_position_orientation([3.0, 1.6, 1.0], [0, 0, 0, 1])
         #self.walls[3].set_position_orientation([3.0, -1.6, 1.0], [0, 0, 0, 1])
+
+        self.step_visualization()
 
         return state
 
