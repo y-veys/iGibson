@@ -70,6 +70,9 @@ class NavigateEnv(BaseEnv):
 
         self.additional_states_dim = self.config.get('additional_states_dim', 0)
         self.goal_dim = self.config.get('goal_dim', 0)
+        self.base_proprioceptive_states_dim = self.config.get('base_proprioceptive_states_dim', 0)
+        self.arm_proprioceptive_states_dim = self.config.get('arm_proprioceptive_states_dim', 0)
+
         self.goal_format = self.config.get('goal_format', 'polar')
 
         # termination condition
@@ -96,7 +99,7 @@ class NavigateEnv(BaseEnv):
         # discount factor
         self.discount_factor = self.config.get('discount_factor', 0.99)
 
-        self.num_obstacles = 2 
+        self.num_obstacles = 0
         self.obstacles = []
         self.obs_dir = []
         self.obs_positions = []
@@ -119,6 +122,18 @@ class NavigateEnv(BaseEnv):
                                                shape=(self.sensor_dim,),
                                                dtype=np.float32)
             observation_space['sensor'] = self.sensor_space
+        if 'base_proprioceptive' in self.output:
+            self.base_proprioceptive_space = gym.spaces.Box(low=-np.inf,
+                                               high=np.inf,
+                                               shape=(self.base_proprioceptive_states_dim,),
+                                               dtype=np.float32)
+            observation_space['base_proprioceptive'] = self.base_proprioceptive_space
+        if 'arm_proprioceptive' in self.output:
+            self.arm_proprioceptive_space = gym.spaces.Box(low=-np.inf,
+                                               high=np.inf,
+                                               shape=(self.arm_proprioceptive_states_dim,),
+                                               dtype=np.float32)
+            observation_space['arm_proprioceptive'] = self.arm_proprioceptive_space
         if 'goal' in self.output:
             self.goal_dim = self.goal_dim
             self.goal_space = gym.spaces.Box(low=-np.inf,
@@ -343,7 +358,7 @@ class NavigateEnv(BaseEnv):
         self.load_task_setup()
         self.load_observation_space()
         self.load_action_space()
-        self.load_walls()
+        #self.load_walls()
         self.load_obstacles()
         self.load_visualization()
         self.load_miscellaneous_variables()
@@ -404,6 +419,46 @@ class NavigateEnv(BaseEnv):
             'additional states dimension mismatch {} v.s. {}'.format(additional_states.shape[0], self.additional_states_dim)
 
         return additional_states
+
+    def get_base_proprioceptive_states(self):
+
+        base_proprioceptive_states = []
+
+        # linear velocity along the x-axis
+        linear_velocity = rotate_vector_3d(self.robots[0].get_linear_velocity(),
+                                           *self.robots[0].get_rpy())[0]
+        # angular velocity along the z-axis
+        angular_velocity = rotate_vector_3d(self.robots[0].get_angular_velocity(),
+                                            *self.robots[0].get_rpy())[2]
+
+        base_proprioceptive_states = np.append(base_proprioceptive_states, [linear_velocity, angular_velocity])
+
+        # Camera location
+        self.robots[0].calc_state()
+        base_proprioceptive_states = np.append(base_proprioceptive_states, np.sin(self.robots[0].joint_position[7]))
+        base_proprioceptive_states = np.append(base_proprioceptive_states, np.cos(self.robots[0].joint_position[7]))
+
+        assert base_proprioceptive_states.shape[0] == self.base_proprioceptive_states_dim, \
+            'base proprioceptive states dimension mismatch {} v.s. {}'.format(base_proprioceptive_states.shape[0], self.base_proprioceptive_states_dim)
+
+        return base_proprioceptive_states
+
+    def get_arm_proprioceptive_states(self):
+
+        arm_proprioceptive_states = []
+
+        # End-effector Position
+        end_effector_pos_local = self.global_to_local(self.robots[0].get_end_effector_position())
+        arm_proprioceptive_states = np.append(arm_proprioceptive_states, end_effector_pos_local)
+
+        arm_proprioceptive_states = np.append(arm_proprioceptive_states, np.sin(self.robots[0].joint_position[2:7]))
+        arm_proprioceptive_states = np.append(arm_proprioceptive_states, np.cos(self.robots[0].joint_position[2:7]))
+        arm_proprioceptive_states = np.append(arm_proprioceptive_states, self.robots[0].joint_velocity[2:7])
+
+        assert arm_proprioceptive_states.shape[0] == self.arm_proprioceptive_states_dim, \
+            'arm proprioceptive states dimension mismatch {} v.s. {}'.format(arm_proprioceptive_states.shape[0], self.arm_proprioceptive_states_dim)
+
+        return arm_proprioceptive_states
 
     def get_goal(self):
         """
@@ -572,6 +627,10 @@ class NavigateEnv(BaseEnv):
         state = OrderedDict()
         if 'sensor' in self.output:
             state['sensor'] = self.get_additional_states()
+        if 'base_proprioceptive' in self.output:
+            state['base_proprioceptive'] = self.get_base_proprioceptive_states()
+        if 'arm_proprioceptive' in self.output:
+            state['arm_proprioceptive'] = self.get_arm_proprioceptive_states()    
         if 'goal' in self.output:
             state['goal'] = self.get_goal()
         if 'rgb' in self.output:
