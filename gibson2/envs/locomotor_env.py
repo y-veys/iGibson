@@ -1160,7 +1160,7 @@ class NavigateRandomEnv(NavigateEnv):
         self.target_pos = np.array(self.config.get('target_pos', [5, 5, 0]))
         self.target_orn = np.array(self.config.get('target_orn', [0, 0, 0]))
 
-        self.target_pos[0] = np.random.uniform(5.5, 6.0)
+        self.target_pos[0] = np.random.uniform(3.0, 4.0)
         self.target_pos[1] = np.random.uniform(-0.5, 0.5)
         self.target_pos[2] = np.random.uniform(0.5, 1.0)
 
