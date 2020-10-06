@@ -99,7 +99,7 @@ class NavigateEnv(BaseEnv):
         # discount factor
         self.discount_factor = self.config.get('discount_factor', 0.99)
 
-        self.num_obstacles = 0
+        self.num_obstacles = 1
         self.obstacles = []
         self.obs_dir = []
         self.obs_positions = []
@@ -115,6 +115,13 @@ class NavigateEnv(BaseEnv):
         self.image_width = self.config.get('image_width', 128)
         self.image_height = self.config.get('image_height', 128)
         observation_space = OrderedDict()
+        if 'close_to_goal' in self.output: 
+            self.close_to_goal_dim = 1
+            self.close_to_goal_space = gym.spaces.Box(low=-np.inf,
+                                               high=np.inf,
+                                               shape=(self.close_to_goal_dim,),
+                                               dtype=np.float32)
+            observation_space['close_to_goal_space'] = self.close_to_goal_space
         if 'sensor' in self.output:
             self.sensor_dim = self.additional_states_dim
             self.sensor_space = gym.spaces.Box(low=-np.inf,
@@ -358,7 +365,7 @@ class NavigateEnv(BaseEnv):
         self.load_task_setup()
         self.load_observation_space()
         self.load_action_space()
-        #self.load_walls()
+        self.load_walls()
         self.load_obstacles()
         self.load_visualization()
         self.load_miscellaneous_variables()
@@ -475,6 +482,13 @@ class NavigateEnv(BaseEnv):
             'goal state dimension mismatch {} v.s. {}'.format(goal.shape[0], self.goal_dim)
 
         return goal
+
+    def get_close_to_goal(self):
+        if self.robots[0].get_position()[0] >= 1.5: 
+        	return 1
+        else: 
+        	return 0
+
 
     def add_naive_noise_to_sensor(self, sensor_reading, noise_rate, noise_value=1.0):
         """
@@ -625,6 +639,8 @@ class NavigateEnv(BaseEnv):
         :return: observation as a dictionary
         """
         state = OrderedDict()
+        if 'close_to_goal' in self.output: 
+        	state['close_to_goal'] = self.get_close_to_goal()
         if 'sensor' in self.output:
             state['sensor'] = self.get_additional_states()
         if 'base_proprioceptive' in self.output:

@@ -5,7 +5,7 @@ wheel_velocity: 0.2
 head_velocity: 0.2
 arm_velocity: 0.0
 
-task: pointgoal
+task: reaching
 fisheye: false
 
 initial_pos: [0.0, 0.0, 0.0]
@@ -15,7 +15,7 @@ target_pos: [6.0, 0.0, 0.0]
 target_orn: [0.0, 0.0, 0.0]
 
 is_discrete: false
-additional_states_dim: 4
+additional_states_dim: 22
 goal_dim: 0
 
 reward_type: l2
@@ -32,7 +32,7 @@ discount_factor: 0.99
 dist_tol: 0.06
 max_step: 100
 
-output: [sensor]
+output: [sensor, close_to_goal]
 resolution: 256
 vertical_fov: 60
 
