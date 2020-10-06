@@ -121,7 +121,7 @@ class NavigateEnv(BaseEnv):
                                                high=np.inf,
                                                shape=(self.close_to_goal_dim,),
                                                dtype=np.float32)
-            observation_space['close_to_goal_space'] = self.close_to_goal_space
+            observation_space['close_to_goal'] = self.close_to_goal_space
         if 'sensor' in self.output:
             self.sensor_dim = self.additional_states_dim
             self.sensor_space = gym.spaces.Box(low=-np.inf,
@@ -485,9 +485,9 @@ class NavigateEnv(BaseEnv):
 
     def get_close_to_goal(self):
         if self.robots[0].get_position()[0] >= 1.5: 
-        	return 1
+        	return 1.0
         else: 
-        	return 0
+        	return 0.0
 
 
     def add_naive_noise_to_sensor(self, sensor_reading, noise_rate, noise_value=1.0):
@@ -640,7 +640,7 @@ class NavigateEnv(BaseEnv):
         """
         state = OrderedDict()
         if 'close_to_goal' in self.output: 
-        	state['close_to_goal'] = self.get_close_to_goal()
+        	  state['close_to_goal'] = self.get_close_to_goal()
         if 'sensor' in self.output:
             state['sensor'] = self.get_additional_states()
         if 'base_proprioceptive' in self.output:
