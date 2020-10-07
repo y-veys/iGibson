@@ -99,7 +99,7 @@ class NavigateEnv(BaseEnv):
         # discount factor
         self.discount_factor = self.config.get('discount_factor', 0.99)
 
-        self.num_obstacles = 1
+        self.num_obstacles = 0
         self.obstacles = []
         self.obs_dir = []
         self.obs_positions = []
@@ -365,7 +365,7 @@ class NavigateEnv(BaseEnv):
         self.load_task_setup()
         self.load_observation_space()
         self.load_action_space()
-        self.load_walls()
+        #self.load_walls()
         self.load_obstacles()
         self.load_visualization()
         self.load_miscellaneous_variables()
