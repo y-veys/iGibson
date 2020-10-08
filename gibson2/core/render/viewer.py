@@ -132,7 +132,11 @@ class Viewer:
             
             seg = self.renderer.render_robot_cameras(modes=('seg'))[1][:, :, 0:1]
             
-            seg = np.clip(seg * 255.0 / 8, 0.0, 1.0)
+            seg = np.clip(seg * 255.0 / 7, 0.0, 1.0)
+
+            all_but_goal = seg < 1
+
+            seg[all_but_goal] = 0
 
             #all_but_goal = seg < 1
 
@@ -142,7 +146,7 @@ class Viewer:
 
             #if (not np.isnan(x_avg) and not np.isnan(y_avg)):
             #    seg[int(round(x_avg)), int(round(y_avg))] = 0
-
+            '''
             depth = self.renderer.render_robot_cameras(modes=('3d'))
             #print(len(depth[0]))
             depth = -self.renderer.render_robot_cameras(modes=('3d'))[1][:, :, 2:3]
@@ -152,6 +156,14 @@ class Viewer:
 
             # re-scale depth to [0.0, 1.0]
             depth /= 10.0
+            '''
+            depth = self.renderer.render_robot_cameras(modes=('seg'))[0][:, :, 0:1]
+            
+            depth = np.clip(depth * 255.0 / 7, 0.0, 1.0)
+
+            #all_but_goal = seg < 1
+
+            #seg[all_but_goal] = 0
             
             #cv2.imshow('RGB', cv2.cvtColor(np.concatenate(rgb, axis=1), cv2.COLOR_RGB2BGR))
             cv2.imshow('SEG', cv2.flip(cv2.rotate(cv2.cvtColor(np.concatenate(seg, axis=1), cv2.COLOR_RGB2BGR), cv2.ROTATE_90_CLOCKWISE),1))

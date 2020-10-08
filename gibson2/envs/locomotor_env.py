@@ -99,7 +99,8 @@ class NavigateEnv(BaseEnv):
         # discount factor
         self.discount_factor = self.config.get('discount_factor', 0.99)
 
-        self.num_obstacles = 0
+        self.num_obstacles = 1
+        self.num_walls = 4
         self.obstacles = []
         self.obs_dir = []
         self.obs_positions = []
@@ -365,7 +366,7 @@ class NavigateEnv(BaseEnv):
         self.load_task_setup()
         self.load_observation_space()
         self.load_action_space()
-        #self.load_walls()
+        self.load_walls()
         self.load_obstacles()
         self.load_visualization()
         self.load_miscellaneous_variables()
@@ -584,7 +585,7 @@ class NavigateEnv(BaseEnv):
         #if self.num_object_classes is not None:
         #    seg = np.clip(seg * 255.0 / self.num_object_classes, 0.0, 1.0)
 
-        seg = np.clip(seg * 255.0 / (6 + self.num_obstacles) , 0.0, 1.0)
+        seg = np.clip(seg * 255.0 / (self.num_walls + self.num_obstacles + 2) , 0.0, 1.0)
 
         #all_but_goal = seg < 1
 
@@ -600,7 +601,7 @@ class NavigateEnv(BaseEnv):
         #if self.num_object_classes is not None:
         #    seg = np.clip(seg * 255.0 / self.num_object_classes, 0.0, 1.0)
 
-        seg = np.clip(seg * 255.0 / (6 + self.num_obstacles) , 0.0, 1.0)
+        seg = np.clip(seg * 255.0 / (self.num_walls + self.num_obstacles + 2) , 0.0, 1.0)
 
         all_but_goal = seg < 1
 
