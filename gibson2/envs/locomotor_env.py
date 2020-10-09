@@ -99,7 +99,7 @@ class NavigateEnv(BaseEnv):
         # discount factor
         self.discount_factor = self.config.get('discount_factor', 0.99)
 
-        self.num_obstacles = 1
+        self.num_obstacles = 2
         self.num_walls = 4
         self.obstacles = []
         self.obs_dir = []
@@ -485,7 +485,7 @@ class NavigateEnv(BaseEnv):
         return goal
 
     def get_close_to_goal(self):
-        if self.robots[0].get_position()[0] >= 1.5: 
+        if self.robots[0].get_position()[0] >= 1.5*self.num_obstacles: 
         	return 1.0
         else: 
         	return 0.0
@@ -852,7 +852,7 @@ class NavigateEnv(BaseEnv):
             for i in range(num_nodes, self.num_waypoints_vis):
                 self.waypoints_vis[i].set_position(pos=np.array([0.0, 0.0, 100.0]))
         '''
-        '''
+        
 
         for i in range(self.num_obstacles):
 
@@ -872,7 +872,7 @@ class NavigateEnv(BaseEnv):
             obs[2] = self.obs_positions[i][2]
 
             self.obstacles[i].set_position_orientation(obs, [0, 0, 0, 1])
-        '''
+        
         '''
         curr_obj_pos = list(self.obstacles[0].get_position())
 
@@ -1100,8 +1100,8 @@ class NavigateEnv(BaseEnv):
         self.reset_variables()
 
         self.obs_dir = [np.random.choice([0,1]) for i in range(self.num_obstacles)]
-        #self.obs_positions = [[2.0*(i+1), np.random.uniform(-0.7,0.7), np.random.choice([1.2,0.075])] for i in range(self.num_obstacles)]
-        self.obs_positions = [[1.5*(i+1), np.random.choice([-0.7,0.7]), np.random.choice([1.2,0.075])] for i in range(self.num_obstacles)]
+        self.obs_positions = [[1.5*(i+1), np.random.uniform(-0.7,0.7), np.random.choice([1.2,0.075])] for i in range(self.num_obstacles)]
+        #self.obs_positions = [[1.5*(i+1), np.random.choice([-0.7,0.7]), np.random.choice([1.2,0.075])] for i in range(self.num_obstacles)]
 
         for i in range(self.num_obstacles):
             self.obstacles[i].set_position_orientation(self.obs_positions[i], [0,0,0,1])
@@ -1179,7 +1179,7 @@ class NavigateRandomEnv(NavigateEnv):
         self.target_pos = np.array(self.config.get('target_pos', [5, 5, 0]))
         self.target_orn = np.array(self.config.get('target_orn', [0, 0, 0]))
 
-        self.target_pos[0] = np.random.uniform(3.0, 4.0)
+        self.target_pos[0] = np.random.uniform(4.0, 5.0)
         self.target_pos[1] = np.random.uniform(-0.5, 0.5)
         self.target_pos[2] = np.random.uniform(0.5, 1.0)
 
