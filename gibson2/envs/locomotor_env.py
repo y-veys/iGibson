@@ -298,7 +298,7 @@ class NavigateEnv(BaseEnv):
 
         for i in range(self.num_obstacles): 
 
-            obstacle = BoxShape(dim=[0.075, 0.6, 0.075], 
+            obstacle = BoxShape(dim=[0.075, 0.7, 0.075], 
                                 visual_only=False, 
                                 mass=0, 
                                 color=[1, 1, 0, 0.95])
@@ -852,6 +852,7 @@ class NavigateEnv(BaseEnv):
             for i in range(num_nodes, self.num_waypoints_vis):
                 self.waypoints_vis[i].set_position(pos=np.array([0.0, 0.0, 100.0]))
         '''
+        '''
 
         for i in range(self.num_obstacles):
 
@@ -871,7 +872,7 @@ class NavigateEnv(BaseEnv):
             obs[2] = self.obs_positions[i][2]
 
             self.obstacles[i].set_position_orientation(obs, [0, 0, 0, 1])
-        
+        '''
         '''
         curr_obj_pos = list(self.obstacles[0].get_position())
 
@@ -1099,7 +1100,8 @@ class NavigateEnv(BaseEnv):
         self.reset_variables()
 
         self.obs_dir = [np.random.choice([0,1]) for i in range(self.num_obstacles)]
-        self.obs_positions = [[2.0*(i+1), np.random.uniform(-0.7,0.7), np.random.choice([1.2,0.075])] for i in range(self.num_obstacles)]
+        #self.obs_positions = [[2.0*(i+1), np.random.uniform(-0.7,0.7), np.random.choice([1.2,0.075])] for i in range(self.num_obstacles)]
+        self.obs_positions = [[1.5*(i+1), np.random.choice([-0.7,0.7]), np.random.choice([1.2,0.075])] for i in range(self.num_obstacles)]
 
         for i in range(self.num_obstacles):
             self.obstacles[i].set_position_orientation(self.obs_positions[i], [0,0,0,1])
