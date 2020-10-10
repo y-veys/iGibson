@@ -132,7 +132,7 @@ class Viewer:
             
             seg = self.renderer.render_robot_cameras(modes=('seg'))[1][:, :, 0:1]
             
-            seg = np.clip(seg * 255.0 / 7, 0.0, 1.0)
+            seg = np.clip(seg * 255.0 / 8, 0.0, 1.0)
 
             all_but_goal = seg < 1
 
@@ -159,7 +159,7 @@ class Viewer:
             '''
             depth = self.renderer.render_robot_cameras(modes=('seg'))[0][:, :, 0:1]
             
-            depth = np.clip(depth * 255.0 / 7, 0.0, 1.0)
+            depth = np.clip(depth * 255.0 / 8, 0.0, 1.0)
 
             #all_but_goal = seg < 1
 

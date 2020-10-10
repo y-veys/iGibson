@@ -298,7 +298,7 @@ class NavigateEnv(BaseEnv):
 
         for i in range(self.num_obstacles): 
 
-            obstacle = BoxShape(dim=[0.075, 0.7, 0.075], 
+            obstacle = BoxShape(dim=[0.075, 0.6, 0.075], 
                                 visual_only=False, 
                                 mass=0, 
                                 color=[1, 1, 0, 0.95])
@@ -864,9 +864,9 @@ class NavigateEnv(BaseEnv):
                 self.obs_dir[i] = False 
 
             if self.obs_dir[i]:
-                obs[1] += -0.02
+                obs[1] += -0.01
             elif not self.obs_dir[i]: 
-                obs[1] += 0.02
+                obs[1] += 0.01
 
             obs[0] = self.obs_positions[i][0]
             obs[2] = self.obs_positions[i][2]
