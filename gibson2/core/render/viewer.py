@@ -132,7 +132,7 @@ class Viewer:
             
             seg = self.renderer.render_robot_cameras(modes=('seg'))[1][:, :, 0:1]
             
-            seg = np.clip(seg * 255.0 / 8, 0.0, 1.0)
+            seg = np.clip(seg * 255.0 / 7, 0.0, 1.0)
 
             all_but_goal = seg < 1
 
@@ -159,11 +159,12 @@ class Viewer:
             '''
             depth = self.renderer.render_robot_cameras(modes=('seg'))[0][:, :, 0:1]
             
-            depth = np.clip(depth * 255.0 / 8, 0.0, 1.0)
+            depth = np.clip(depth * 255.0 / 7, 0.0, 1.0)
 
-            #all_but_goal = seg < 1
-
-            #seg[all_but_goal] = 0
+            all_but_goal = depth < 0.8 
+            depth[all_but_goal] = 0
+            all_but_goal = depth > 0.9 
+            depth[all_but_goal] = 0
             
             #cv2.imshow('RGB', cv2.cvtColor(np.concatenate(rgb, axis=1), cv2.COLOR_RGB2BGR))
             cv2.imshow('SEG', cv2.flip(cv2.rotate(cv2.cvtColor(np.concatenate(seg, axis=1), cv2.COLOR_RGB2BGR), cv2.ROTATE_90_CLOCKWISE),1))

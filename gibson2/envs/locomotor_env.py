@@ -99,7 +99,7 @@ class NavigateEnv(BaseEnv):
         # discount factor
         self.discount_factor = self.config.get('discount_factor', 0.99)
 
-        self.num_obstacles = 2
+        self.num_obstacles = 1
         self.num_walls = 4
         self.obstacles = []
         self.obs_dir = []
@@ -587,9 +587,10 @@ class NavigateEnv(BaseEnv):
 
         seg = np.clip(seg * 255.0 / (self.num_walls + self.num_obstacles + 2) , 0.0, 1.0)
 
-        #all_but_goal = seg < 1
-
-        #seg[all_but_goal] = 0
+        all_but_goal = seg < 0.8 
+        seg[all_but_goal] = 0
+        all_but_goal = seg > 0.9 
+        seg[all_but_goal] = 0
 
         return seg
 
@@ -864,9 +865,9 @@ class NavigateEnv(BaseEnv):
                 self.obs_dir[i] = False 
 
             if self.obs_dir[i]:
-                obs[1] += -0.01
+                obs[1] += -0.02
             elif not self.obs_dir[i]: 
-                obs[1] += 0.01
+                obs[1] += 0.02
 
             obs[0] = self.obs_positions[i][0]
             obs[2] = self.obs_positions[i][2]
