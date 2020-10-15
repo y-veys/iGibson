@@ -108,6 +108,8 @@ class NavigateEnv(BaseEnv):
         self.reset_step = 25
         self.walls = []
 
+        self._num_envs = 1
+
     def load_observation_space(self):
         """
         Load observation space
