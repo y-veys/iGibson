@@ -108,6 +108,8 @@ class NavigateEnv(BaseEnv):
         self.reset_step = 25
         self.walls = []
 
+        self._num_envs = 1
+
     def load_observation_space(self):
         """
         Load observation space
@@ -1175,7 +1177,7 @@ class NavigateRandomEnv(NavigateEnv):
         self.target_pos = np.array(self.config.get('target_pos', [5, 5, 0]))
         self.target_orn = np.array(self.config.get('target_orn', [0, 0, 0]))
 
-        self.target_pos[0] = np.random.uniform(4.0, 5.0)
+        self.target_pos[0] = np.random.uniform(5.0, 6.0)
         self.target_pos[1] = np.random.uniform(-0.5, 0.5)
         self.target_pos[2] = np.random.uniform(0.5, 1.0)
 
