@@ -773,7 +773,7 @@ class JR2_Kinova_Head(LocomotorRobot):
         self.ordered_joints[5].reset_joint_state(np.pi/2.0, 0.0)
         self.ordered_joints[6].reset_joint_state(0.0, 0.0)
         self.ordered_joints[7].reset_joint_state(0.0, 0.0)
-        self.ordered_joints[8].reset_joint_state(0.52, 0.0)
+        self.ordered_joints[8].reset_joint_state(0.0, 0.0)
 
     def load(self):
         ids = super(JR2_Kinova_Head, self).load()
