@@ -100,6 +100,7 @@ class NavigateEnv(BaseEnv):
         self.discount_factor = self.config.get('discount_factor', 0.99)
 
         self.num_obstacles = 0
+        print("NUM OBSTACLES: {}".format(self.num_obstacles))
         self.num_walls = 4
         self.obstacles = []
         self.obs_dir = []
