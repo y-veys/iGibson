@@ -99,7 +99,7 @@ class NavigateEnv(BaseEnv):
         # discount factor
         self.discount_factor = self.config.get('discount_factor', 0.99)
 
-        self.num_obstacles = 2
+        self.num_obstacles = 0
         self.num_walls = 4
         self.obstacles = []
         self.obs_dir = []
@@ -793,16 +793,19 @@ class NavigateEnv(BaseEnv):
         if self.is_goal_reached():
             done = True
             info['success'] = True
+            print('SUCCESS_GOAL_REACHED')
 
         # max collisions reached
         if self.collision_step > self.max_collisions_allowed:
             done = True
             info['success'] = False
+            print('COLLISION')
 
         # time out
         elif self.current_step >= self.max_step:
             done = True
             info['success'] = False
+            print('TIMEOUT')
 
         if done:
             info['episode_length'] = self.current_step
