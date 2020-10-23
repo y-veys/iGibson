@@ -99,7 +99,7 @@ class NavigateEnv(BaseEnv):
         # discount factor
         self.discount_factor = self.config.get('discount_factor', 0.99)
 
-        self.num_obstacles = 2
+        self.num_obstacles = 0
         print("NUM OBSTACLES: {}".format(self.num_obstacles))
         self.num_walls = 4
         self.obstacles = []
@@ -360,6 +360,7 @@ class NavigateEnv(BaseEnv):
         self.collision_step = 0
         self.current_episode = 0
         self.floor_num = 0
+        self.episode_return = 0.0
 
     def load(self):
         """
@@ -809,6 +810,7 @@ class NavigateEnv(BaseEnv):
             print('TIMEOUT')
 
         if done:
+            print('RETURN:', self.episode_return)
             info['episode_length'] = self.current_step
             info['collision_step'] = self.collision_step
             info['path_length'] = self.path_length
@@ -917,6 +919,7 @@ class NavigateEnv(BaseEnv):
         state = self.get_state(collision_links)
         info = {}
         reward, info = self.get_reward(collision_links, action, info)
+        self.episode_return += reward
         done, info = self.get_termination(collision_links, action, info)
         self.step_visualization()
 
@@ -1087,6 +1090,7 @@ class NavigateEnv(BaseEnv):
         self.collision_step = 0
         self.path_length = 0.0
         self.geodesic_dist = self.get_geodesic_potential()
+        self.episode_return = 0.0
 
     def reset(self):
         """
