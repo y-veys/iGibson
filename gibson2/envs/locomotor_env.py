@@ -103,6 +103,10 @@ class NavigateEnv(BaseEnv):
         self.obstacle_type = self.config.get('obstacle_type', 'block')
 
         print("NUM OBSTACLES: {}".format(self.num_obstacles))
+        print("TYPE OBSTACLE: {}".format(self.obstacle_type))
+        print("TASK TYPE: {}".format(self.config["task"]))
+        print("TOLERANCE: {}".format(self.dist_tol))
+        
         self.num_walls = 5
         self.obstacles = []
         self.obs_dir = []
