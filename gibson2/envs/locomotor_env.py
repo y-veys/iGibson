@@ -330,7 +330,6 @@ class NavigateEnv(BaseEnv):
             self.obstacles.append(obstacle)
 
     def load_walls(self):
-
         back_wall = BoxShape(pos=[-2.0, 0, 1.0], 
                           dim=[0.1, 1.5, 1.0], 
                           visual_only=False, 
@@ -376,6 +375,17 @@ class NavigateEnv(BaseEnv):
         self.walls.append(left_wall)
         self.walls.append(right_wall)
         self.walls.append(ceiling)
+
+        self.wall_constraints = []
+        for wall in self.walls:
+            constraint = p.createConstraint(
+                0, -1, wall.body_id, -1, p.JOINT_FIXED,
+                [0, 0, 1],
+                wall.get_position(),
+                [0, 0, 0],
+                wall.get_orientation(),
+                [0, 0, 0, 1])
+            self.wall_constraints.append(constraint)
 
     def load_miscellaneous_variables(self):
         """
