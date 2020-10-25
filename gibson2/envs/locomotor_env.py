@@ -99,7 +99,7 @@ class NavigateEnv(BaseEnv):
         # discount factor
         self.discount_factor = self.config.get('discount_factor', 0.99)
 
-        self.num_obstacles = 2
+        self.num_obstacles = self.config.get('num_obstacles', 0)
         print("NUM OBSTACLES: {}".format(self.num_obstacles))
         self.num_walls = 4
         self.obstacles = []
@@ -609,9 +609,8 @@ class NavigateEnv(BaseEnv):
 
         seg = np.clip(seg * 255.0 / (self.num_walls + self.num_obstacles + 2) , 0.0, 1.0)
 
-        all_but_goal = seg < 1
-
-        seg[all_but_goal] = 0
+        #all_but_goal = seg < 1
+        #seg[all_but_goal] = 0
 
         return seg
 
@@ -1100,14 +1099,6 @@ class NavigateEnv(BaseEnv):
         Reset episode
         """
         self.reset_agent()
-        self.simulator.sync()
-        state = self.get_state()
-        if self.reward_type == 'l2':
-            self.potential = self.get_l2_potential()
-        elif self.reward_type == 'geodesic':
-            self.potential = self.get_geodesic_potential()
-        self.reset_variables()
-
         self.obs_dir = [np.random.choice([0,1]) for i in range(self.num_obstacles)]
         self.obs_positions = [[1.5*(i+1), np.random.uniform(-0.7,0.7), np.random.choice([1.2,0.075])] for i in range(self.num_obstacles)]
         #self.obs_positions = [[1.5*(i+1), np.random.choice([-0.7,0.7]), np.random.choice([1.2,0.075])] for i in range(self.num_obstacles)]
@@ -1121,6 +1112,14 @@ class NavigateEnv(BaseEnv):
         #self.walls[3].set_position_orientation([3.0, -1.6, 1.0], [0, 0, 0, 1])
 
         self.step_visualization()
+
+        self.simulator.sync()
+        state = self.get_state()
+        if self.reward_type == 'l2':
+            self.potential = self.get_l2_potential()
+        elif self.reward_type == 'geodesic':
+            self.potential = self.get_geodesic_potential()
+        self.reset_variables()
 
         return state
 

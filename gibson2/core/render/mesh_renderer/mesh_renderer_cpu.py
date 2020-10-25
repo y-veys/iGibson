@@ -762,7 +762,7 @@ class MeshRenderer(object):
                 mat = quat2rotmat(xyzw2wxyz(orn))[:3, :3]
                 view_direction = mat.dot(np.array([1, 0, 0]))
                 self.set_camera(camera_pos, camera_pos + view_direction, [0, 0, 1])
-                #self.set_fov(60)
+                self.set_fov(60)
                 for item in self.render(modes=modes, hidden=[instance]):
                     frames.append(item)
 
@@ -772,7 +772,7 @@ class MeshRenderer(object):
                     wrist_mat = quat2rotmat(xyzw2wxyz(wrist_orn))[:3, :3]
                     wrist_view_direction = wrist_mat.dot(np.array([1, 0, 0]))
                     self.set_camera(wrist_camera_pos, wrist_camera_pos + wrist_view_direction, [0, 0, 1])
-                    #self.set_fov(80)
+                    self.set_fov(90)
                     for item in self.render(modes=modes, hidden=[instance]):
                         frames.append(item)
 
