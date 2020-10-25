@@ -6,7 +6,7 @@ head_velocity: 0.0
 arm_velocity: 0.4
 
 task: reaching
-num_obstacles: 2
+num_obstacles: 0
 fisheye: false
 
 initial_pos: [0.0, 0.0, 0.0]

@@ -127,13 +127,14 @@ class Viewer:
                 frame = cv2.cvtColor(np.concatenate(frames, axis=1), cv2.COLOR_RGB2BGR)
                 cv2.imshow('RGB', frame)
 
-            num_obstacles = 0
+            num_obstacles = 2
 
             # SEGMENTATION MASK OF HEAD 
             # The segmentation mask of the head should show the obstacles, walls, and the goal
             seg_head = self.renderer.render_robot_cameras(modes=('seg'))[0][:, :, 0:1]
             seg_head = np.clip(seg_head * 255.0 / (6 + num_obstacles), 0.0, 1.0)
-
+            all_but_goal = seg_head < 1
+            seg_head[all_but_goal] = 0
 
             # SEGMENTATION MASK OF WRIST 
             # The segmentation mask of the wrist should only show the goal 
