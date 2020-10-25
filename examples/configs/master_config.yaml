@@ -5,7 +5,7 @@ wheel_velocity: 0.4
 head_velocity: 0.0
 arm_velocity: 0.4
 
-task: reaching           # pointgoal or reaching
+task: reaching            # pointgoal or reaching
 num_obstacles: 2          # number of obstacles, 0 or 2
 obstacle_type: block      # block or realistic
 dist_tol: 0.1             # 0.1 for reaching, 0.5 for pointgoal 
