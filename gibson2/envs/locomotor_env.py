@@ -1,6 +1,6 @@
 import gibson2
-from gibson2.core.physics.interactive_objects import VisualMarker, InteractiveObj, BoxShape, YCBObject
-from gibson2.core.physics.robot_locomotors import Turtlebot, Quadrotor
+from gibson2.core.physics.interactive_objects import VisualMarker, InteractiveObj, BoxShape, YCBObject, VisualShape
+from gibson2.core.physics.robot_locomotors import Turtlebot
 from gibson2.utils.utils import parse_config, rotate_vector_3d, l2_distance, quatToXYZW, cartesian_to_polar
 from gibson2.envs.base_env import BaseEnv
 from transforms3d.euler import euler2quat
@@ -303,11 +303,13 @@ class NavigateEnv(BaseEnv):
 
     def load_obstacles(self):
         for i in range(self.num_obstacles):
-            obstacle = Quadrotor(self.config)
-            self.simulator.import_robot(obstacle)
+            obstacle = VisualShape(
+                os.path.join(gibson2.assets_path, 'models/quadrotor/quadrotor_base.obj'),
+                scale=[0.025, 0.2, 0.2])
+            self.simulator.import_object(obstacle)
             # set mass to 0.0 to avoid gravity
-            for joint_id in range(-1, p.getNumJoints(obstacle.robot_ids[0])):
-                p.changeDynamics(obstacle.robot_ids[0], joint_id, mass=0.0)
+            for joint_id in range(-1, p.getNumJoints(obstacle.body_id)):
+                p.changeDynamics(obstacle.body_id, joint_id, mass=0.0)
             # obstacle = BoxShape(dim=[0.075, 0.6, 0.075], 
             #                     visual_only=False, 
             #                     mass=0, 

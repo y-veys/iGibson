@@ -183,6 +183,26 @@ class VisualMarker(Object):
     def set_color(self, color):
         p.changeVisualShape(self.body_id, -1, rgbaColor=color)
 
+class VisualShape(Object):
+    def __init__(self,
+                 filename,
+                 scale=1.0):
+        """
+        create a visual shape to show in pybullet and MeshRenderer
+
+        :param filename: obj filename
+        """
+        super(VisualShape, self).__init__()
+        self.filename = filename
+        self.scale = scale
+
+    def _load(self):
+        visual_id = p.createVisualShape(p.GEOM_MESH,
+                                        fileName=self.filename,
+                                        meshScale=self.scale)
+        body_id = p.createMultiBody(baseCollisionShapeIndex=-1,
+                                    baseVisualShapeIndex=visual_id)
+        return body_id
 
 class BoxShape(Object):
     def __init__(self, pos=[1, 2, 3], dim=[1, 2, 3], visual_only=False, mass=1000, color=[1, 1, 1, 1]):
