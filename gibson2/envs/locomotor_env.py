@@ -101,7 +101,7 @@ class NavigateEnv(BaseEnv):
 
         self.num_obstacles = 2
         print("NUM OBSTACLES: {}".format(self.num_obstacles))
-        self.num_walls = 4
+        self.num_walls = 5
         self.obstacles = []
         self.obs_dir = []
         self.obs_positions = []
@@ -146,12 +146,18 @@ class NavigateEnv(BaseEnv):
                                                dtype=np.float32)
             observation_space['arm_proprioceptive'] = self.arm_proprioceptive_space
         if 'goal' in self.output:
-            self.goal_dim = self.goal_dim
             self.goal_space = gym.spaces.Box(low=-np.inf,
                                                high=np.inf,
                                                shape=(self.goal_dim,),
                                                dtype=np.float32)
             observation_space['goal'] = self.goal_space
+        if 'last_camera_mask_indices' in self.output:
+            self.last_camera_mask_indices_space = gym.spaces.Box(
+                low=-np.inf,
+                high=np.inf,
+                shape=(1,),
+                dtype=np.int64)
+            observation_space['last_camera_mask_indices'] = self.last_camera_mask_indices_space
         if 'rgb' in self.output:
             self.rgb_space = gym.spaces.Box(low=0.0,
                                             high=1.0,
@@ -343,11 +349,17 @@ class NavigateEnv(BaseEnv):
                           visual_only=False, 
                           mass=1000, 
                           color=[1, 1, 1, 1])
+        ceiling = BoxShape(pos=[3, 0, 2.05],
+                           dim=[5.1, 1.7, 0.05],
+                           visual_only=False,
+                           mass=1000,
+                           color=[1, 1, 1, 1])
 
         self.simulator.import_object(back_wall)
         self.simulator.import_object(front_wall)
         self.simulator.import_object(left_wall)
         self.simulator.import_object(right_wall)
+        self.simulator.import_object(ceiling)
 
         # back_wall.load()
         # front_wall.load()
@@ -358,6 +370,7 @@ class NavigateEnv(BaseEnv):
         self.walls.append(front_wall)
         self.walls.append(left_wall)
         self.walls.append(right_wall)
+        self.walls.append(ceiling)
 
     def load_miscellaneous_variables(self):
         """
@@ -656,6 +669,8 @@ class NavigateEnv(BaseEnv):
             state['arm_proprioceptive'] = self.get_arm_proprioceptive_states()    
         if 'goal' in self.output:
             state['goal'] = self.get_goal()
+        if 'last_camera_mask_indices' in self.output:
+            state['last_camera_mask_indices'] = self.last_camera_mask_indices
         if 'rgb' in self.output:
             state['rgb'] = self.get_rgb()
         if 'wrist_rgb' in self.output:
@@ -974,6 +989,8 @@ class NavigateEnv(BaseEnv):
             self.robots[0].ordered_joints[7].reset_joint_state(0.0, 0.0)
             self.robots[0].ordered_joints[8].reset_joint_state(0.0, 0.0)
 
+        self.last_camera_mask_indices = camera_mask_indices[0]
+
     def reset_agent(self):
         """
         Reset the robot's joint configuration and base pose until no collision
@@ -1101,6 +1118,8 @@ class NavigateEnv(BaseEnv):
         """
         self.reset_agent()
         self.simulator.sync()
+        # default camera mask indices is 1, 0 degree
+        self.last_camera_mask_indices = 1
         state = self.get_state()
         if self.reward_type == 'l2':
             self.potential = self.get_l2_potential()
