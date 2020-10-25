@@ -355,7 +355,7 @@ class NavigateEnv(BaseEnv):
                           mass=1000, 
                           color=[1, 1, 1, 1])
         ceiling = BoxShape(pos=[3, 0, 2.05],
-                           dim=[5.1, 1.7, 0.05],
+                           dim=[5.2, 1.8, 0.05],
                            visual_only=False,
                            mass=1000,
                            color=[1, 1, 1, 1])
