@@ -200,7 +200,10 @@ class VisualShape(Object):
         visual_id = p.createVisualShape(p.GEOM_MESH,
                                         fileName=self.filename,
                                         meshScale=self.scale)
-        body_id = p.createMultiBody(baseCollisionShapeIndex=-1,
+        collision_id = p.createCollisionShape(p.GEOM_MESH,
+                                              fileName=self.filename,
+                                              meshScale=self.scale)
+        body_id = p.createMultiBody(baseCollisionShapeIndex=collision_id,
                                     baseVisualShapeIndex=visual_id)
         return body_id
 
