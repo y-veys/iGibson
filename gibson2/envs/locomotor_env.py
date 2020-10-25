@@ -696,7 +696,7 @@ class NavigateEnv(BaseEnv):
         if 'goal' in self.output:
             state['goal'] = self.get_goal()
         if 'last_camera_mask_indices' in self.output:
-            state['last_camera_mask_indices'] = self.last_camera_mask_indices
+            state['last_camera_mask_indices'] = np.array([self.last_camera_mask_indices], dtype=np.int64)
         if 'rgb' in self.output:
             state['rgb'] = self.get_rgb()
         if 'wrist_rgb' in self.output:
