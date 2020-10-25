@@ -1,6 +1,6 @@
 import gibson2
-from gibson2.core.physics.interactive_objects import VisualMarker, InteractiveObj, BoxShape
-from gibson2.core.physics.robot_locomotors import Turtlebot
+from gibson2.core.physics.interactive_objects import VisualMarker, InteractiveObj, BoxShape, YCBObject
+from gibson2.core.physics.robot_locomotors import Turtlebot, Quadrotor
 from gibson2.utils.utils import parse_config, rotate_vector_3d, l2_distance, quatToXYZW, cartesian_to_polar
 from gibson2.envs.base_env import BaseEnv
 from transforms3d.euler import euler2quat
@@ -284,10 +284,12 @@ class NavigateEnv(BaseEnv):
             #                                       rgba_color=[1, 1, 0, 0.7],
             #                                       radius=0.02,
             #                                       length=5)
-            self.target_pos_vis_obj = VisualMarker(visual_shape=p.GEOM_SPHERE,
-                                                   rgba_color=[1, 0, 0, 1],
-                                                   radius=0.1)
-
+            original_size = np.array([0.07733, 0.169027, 0.218797])
+            scale = self.dist_tol * 2 / original_size
+            self.target_pos_vis_obj = YCBObject('003_cracker_box', scale=scale, collision=False)
+            # self.target_pos_vis_obj = VisualMarker(visual_shape=p.GEOM_SPHERE,
+            #                                        rgba_color=[1, 0, 0, 1],
+            #                                        radius=0.1)
             #self.initial_pos_vis_obj.load()
 
             if self.config.get('target_visual_object_visible_to_agent', False):
@@ -296,18 +298,22 @@ class NavigateEnv(BaseEnv):
             else:
                 self.target_pos_vis_obj.load()
                 #self.target_pos_vis_obj_exact.load()
+            # set mass to 0.0 to avoid gravity
+            p.changeDynamics(self.target_pos_vis_obj.body_id, -1, mass=0.0)
 
     def load_obstacles(self):
-
-        for i in range(self.num_obstacles): 
-
-            obstacle = BoxShape(dim=[0.075, 0.6, 0.075], 
-                                visual_only=False, 
-                                mass=0, 
-                                color=[1, 1, 0, 0.95])
-
-            self.simulator.import_object(obstacle)
-            obstacle.load()
+        for i in range(self.num_obstacles):
+            obstacle = Quadrotor(self.config)
+            self.simulator.import_robot(obstacle)
+            # set mass to 0.0 to avoid gravity
+            for joint_id in range(-1, p.getNumJoints(obstacle.robot_ids[0])):
+                p.changeDynamics(obstacle.robot_ids[0], joint_id, mass=0.0)
+            # obstacle = BoxShape(dim=[0.075, 0.6, 0.075], 
+            #                     visual_only=False, 
+            #                     mass=0, 
+            #                     color=[1, 1, 0, 0.95])
+            # self.simulator.import_object(obstacle)
+            # obstacle.load()
             self.obstacles.append(obstacle)
 
     def load_walls(self):
@@ -341,11 +347,10 @@ class NavigateEnv(BaseEnv):
         self.simulator.import_object(left_wall)
         self.simulator.import_object(right_wall)
 
-
-        back_wall.load()
-        front_wall.load()
-        left_wall.load()
-        right_wall.load()
+        # back_wall.load()
+        # front_wall.load()
+        # left_wall.load()
+        # right_wall.load()
 
         self.walls.append(back_wall)
         self.walls.append(front_wall)
