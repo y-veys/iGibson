@@ -356,8 +356,8 @@ class NavigateEnv(BaseEnv):
                           color=[1, 1, 1, 1])
         ceiling = BoxShape(pos=[3, 0, 2.05],
                            dim=[5.2, 1.8, 0.05],
-                           visual_only=False,
-                           mass=1000,
+                           visual_only=True,
+                           mass=0,
                            color=[1, 1, 1, 1])
 
         self.simulator.import_object(back_wall)
