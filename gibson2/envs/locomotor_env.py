@@ -99,7 +99,7 @@ class NavigateEnv(BaseEnv):
         # discount factor
         self.discount_factor = self.config.get('discount_factor', 0.99)
 
-        self.num_obstacles = 2
+        self.num_obstacles = self.config.get('num_obstacles', 0)
         print("NUM OBSTACLES: {}".format(self.num_obstacles))
         self.num_walls = 5
         self.obstacles = []
@@ -290,13 +290,16 @@ class NavigateEnv(BaseEnv):
             #                                       rgba_color=[1, 1, 0, 0.7],
             #                                       radius=0.02,
             #                                       length=5)
+            '''
             original_size = np.array([0.07733, 0.169027, 0.218797])
             scale = self.dist_tol * 2 / original_size
             self.target_pos_vis_obj = YCBObject('003_cracker_box', scale=scale, collision=False)
-            # self.target_pos_vis_obj = VisualMarker(visual_shape=p.GEOM_SPHERE,
-            #                                        rgba_color=[1, 0, 0, 1],
-            #                                        radius=0.1)
+            '''
+            self.target_pos_vis_obj = VisualMarker(visual_shape=p.GEOM_SPHERE,
+                                                    rgba_color=[1, 0, 0, 1],
+                                                    radius=0.09)
             #self.initial_pos_vis_obj.load()
+            
 
             if self.config.get('target_visual_object_visible_to_agent', False):
                 self.simulator.import_object(self.target_pos_vis_obj)
@@ -305,10 +308,11 @@ class NavigateEnv(BaseEnv):
                 self.target_pos_vis_obj.load()
                 #self.target_pos_vis_obj_exact.load()
             # set mass to 0.0 to avoid gravity
-            p.changeDynamics(self.target_pos_vis_obj.body_id, -1, mass=0.0)
+            #p.changeDynamics(self.target_pos_vis_obj.body_id, -1, mass=0.0)
 
     def load_obstacles(self):
         for i in range(self.num_obstacles):
+            '''
             obstacle = VisualShape(
                 os.path.join(gibson2.assets_path, 'models/quadrotor/quadrotor_base.obj'),
                 scale=[0.025, 0.2, 0.2])
@@ -316,12 +320,13 @@ class NavigateEnv(BaseEnv):
             # set mass to 0.0 to avoid gravity
             for joint_id in range(-1, p.getNumJoints(obstacle.body_id)):
                 p.changeDynamics(obstacle.body_id, joint_id, mass=0.0)
-            # obstacle = BoxShape(dim=[0.075, 0.6, 0.075], 
-            #                     visual_only=False, 
-            #                     mass=0, 
-            #                     color=[1, 1, 0, 0.95])
-            # self.simulator.import_object(obstacle)
-            # obstacle.load()
+            '''
+            obstacle = BoxShape(dim=[0.075, 0.6, 0.075], 
+                                 visual_only=False, 
+                                 mass=0, 
+                                 color=[1, 1, 0, 0.95])
+            self.simulator.import_object(obstacle)
+            obstacle.load()
             self.obstacles.append(obstacle)
 
     def load_walls(self):
@@ -610,6 +615,9 @@ class NavigateEnv(BaseEnv):
 
         seg = np.clip(seg * 255.0 / (self.num_walls + self.num_obstacles + 2) , 0.0, 1.0)
 
+        all_but_goal = seg < 1
+        seg[all_but_goal] = 0
+
         return seg
 
     def get_wrist_seg(self):
@@ -623,7 +631,6 @@ class NavigateEnv(BaseEnv):
         seg = np.clip(seg * 255.0 / (self.num_walls + self.num_obstacles + 2) , 0.0, 1.0)
 
         all_but_goal = seg < 1
-
         seg[all_but_goal] = 0
 
         return seg
@@ -1117,16 +1124,6 @@ class NavigateEnv(BaseEnv):
         Reset episode
         """
         self.reset_agent()
-        self.simulator.sync()
-        # default camera mask indices is 1, 0 degree
-        self.last_camera_mask_indices = 1
-        state = self.get_state()
-        if self.reward_type == 'l2':
-            self.potential = self.get_l2_potential()
-        elif self.reward_type == 'geodesic':
-            self.potential = self.get_geodesic_potential()
-        self.reset_variables()
-
         self.obs_dir = [np.random.choice([0,1]) for i in range(self.num_obstacles)]
         self.obs_positions = [[1.5*(i+1), np.random.uniform(-0.7,0.7), np.random.choice([1.2,0.075])] for i in range(self.num_obstacles)]
         #self.obs_positions = [[1.5*(i+1), np.random.choice([-0.7,0.7]), np.random.choice([1.2,0.075])] for i in range(self.num_obstacles)]
@@ -1140,6 +1137,17 @@ class NavigateEnv(BaseEnv):
         #self.walls[3].set_position_orientation([3.0, -1.6, 1.0], [0, 0, 0, 1])
 
         self.step_visualization()
+
+        self.simulator.sync()
+        # default camera mask indices is 1, 0 degree
+        self.last_camera_mask_indices = 1
+
+        state = self.get_state()
+        if self.reward_type == 'l2':
+            self.potential = self.get_l2_potential()
+        elif self.reward_type == 'geodesic':
+            self.potential = self.get_geodesic_potential()
+        self.reset_variables()
 
         return state
 
