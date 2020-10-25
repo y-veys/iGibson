@@ -748,7 +748,7 @@ class JR2_Kinova_Head(LocomotorRobot):
                                 scale=config.get("robot_scale", 1.0),
                                 is_discrete=config.get("is_discrete", False),
                                 control='velocity',
-                                self_collision=False)
+                                self_collision=True)
 
     def set_up_continuous_action_space(self):
         self.action_high = np.array([self.wheel_velocity] * self.wheel_dim + [self.head_velocity] * self.head_dim + [self.arm_velocity] * self.arm_dim)
