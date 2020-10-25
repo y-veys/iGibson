@@ -16,7 +16,7 @@ def main():
         for i in range(1000):
             with Profiler('Env action step'):
                 action = nav_env.action_space.sample()
-                action = [0,0,0,0,0,0,0]
+                action = [1,1,0,0,0,0,0]
                 state, reward, done, info = nav_env.step(action)
                 print(state['close_to_goal'])
                 #nav_env.set_camera([np.random.choice([0,1,2,3,4,5,6,7,8])])

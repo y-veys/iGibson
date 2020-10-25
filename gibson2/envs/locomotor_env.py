@@ -100,6 +100,8 @@ class NavigateEnv(BaseEnv):
         self.discount_factor = self.config.get('discount_factor', 0.99)
 
         self.num_obstacles = self.config.get('num_obstacles', 0)
+        self.obstacle_type = self.config.get('obstacle_type', 'block')
+
         print("NUM OBSTACLES: {}".format(self.num_obstacles))
         self.num_walls = 5
         self.obstacles = []
@@ -290,12 +292,16 @@ class NavigateEnv(BaseEnv):
             #                                       rgba_color=[1, 1, 0, 0.7],
             #                                       radius=0.02,
             #                                       length=5)
-            '''
-            original_size = np.array([0.07733, 0.169027, 0.218797])
-            scale = self.dist_tol * 2 / original_size
-            self.target_pos_vis_obj = YCBObject('003_cracker_box', scale=scale, collision=False)
-            '''
-            self.target_pos_vis_obj = VisualMarker(visual_shape=p.GEOM_SPHERE,
+            
+            if self.obstacle_type == 'realistic':
+                original_size = np.array([0.07733, 0.169027, 0.218797])
+                scale = self.dist_tol * 2 / original_size
+                if self.config['task'] == 'pointgoal':
+                    scale = 0.2 / original_size
+                self.target_pos_vis_obj = YCBObject('003_cracker_box', scale=scale, collision=False)
+            
+            elif self.obstacle_type == 'block':
+                self.target_pos_vis_obj = VisualMarker(visual_shape=p.GEOM_SPHERE,
                                                     rgba_color=[1, 0, 0, 1],
                                                     radius=0.09)
             #self.initial_pos_vis_obj.load()
@@ -308,23 +314,26 @@ class NavigateEnv(BaseEnv):
                 self.target_pos_vis_obj.load()
                 #self.target_pos_vis_obj_exact.load()
             # set mass to 0.0 to avoid gravity
-            #p.changeDynamics(self.target_pos_vis_obj.body_id, -1, mass=0.0)
+            
+            if self.obstacle_type == 'realistic':
+                p.changeDynamics(self.target_pos_vis_obj.body_id, -1, mass=0.0)
 
     def load_obstacles(self):
         for i in range(self.num_obstacles):
-            '''
-            obstacle = VisualShape(
-                os.path.join(gibson2.assets_path, 'models/quadrotor/quadrotor_base.obj'),
-                scale=[0.025, 0.2, 0.2])
-            self.simulator.import_object(obstacle)
-            # set mass to 0.0 to avoid gravity
-            for joint_id in range(-1, p.getNumJoints(obstacle.body_id)):
-                p.changeDynamics(obstacle.body_id, joint_id, mass=0.0)
-            '''
-            obstacle = BoxShape(dim=[0.075, 0.6, 0.075], 
-                                 visual_only=False, 
-                                 mass=0, 
-                                 color=[1, 1, 0, 0.95])
+            if self.obstacle_type == 'realistic':
+                obstacle = VisualShape(
+                    os.path.join(gibson2.assets_path, 'models/quadrotor/quadrotor_base.obj'),
+                    scale=[0.025, 0.2, 0.2])
+                self.simulator.import_object(obstacle)
+                # set mass to 0.0 to avoid gravity
+                for joint_id in range(-1, p.getNumJoints(obstacle.body_id)):
+                    p.changeDynamics(obstacle.body_id, joint_id, mass=0.0)
+            
+            elif self.obstacle_type == 'block':
+                obstacle = BoxShape(dim=[0.075, 0.6, 0.075], 
+                                     visual_only=False, 
+                                     mass=0, 
+                                     color=[1, 1, 0, 0.95])
             self.simulator.import_object(obstacle)
             obstacle.load()
             self.obstacles.append(obstacle)
@@ -878,7 +887,11 @@ class NavigateEnv(BaseEnv):
             return
 
         #self.initial_pos_vis_obj.set_position(self.initial_pos)
-        self.target_pos_vis_obj.set_position(self.target_pos)
+
+        if self.config['task'] == 'pointgoal':
+            self.target_pos_vis_obj.set_position([self.target_pos[0], self.target_pos[1], 1.0])
+        elif self.config['task'] == 'reaching':
+            self.target_pos_vis_obj.set_position(self.target_pos)
         #self.target_pos_vis_obj_exact.set_position(self.target_pos)
 
         '''
@@ -1227,7 +1240,11 @@ class NavigateRandomEnv(NavigateEnv):
 
         self.target_pos[0] = np.random.uniform(5.0, 6.0)
         self.target_pos[1] = np.random.uniform(-0.5, 0.5)
-        self.target_pos[2] = np.random.uniform(0.5, 1.0)
+
+        if self.config['task'] == 'pointgoal':
+            self.target_pos[2] = 0.0
+        elif self.config['task'] == 'reaching':
+            self.target_pos[2] = np.random.uniform(0.5, 1.0)
 
     def reset(self):
         """
