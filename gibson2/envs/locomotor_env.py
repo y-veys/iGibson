@@ -867,6 +867,7 @@ class NavigateEnv(BaseEnv):
             print('TIMEOUT')
 
         if done:
+            print('RETURN:', self.episode_return)
             info['episode_length'] = self.current_step
             info['collision_step'] = self.collision_step
             info['path_length'] = self.path_length
@@ -979,6 +980,7 @@ class NavigateEnv(BaseEnv):
         state = self.get_state(collision_links)
         info = {}
         reward, info = self.get_reward(collision_links, action, info)
+        self.episode_return += reward
         done, info = self.get_termination(collision_links, action, info)
         self.step_visualization()
 
@@ -1150,6 +1152,7 @@ class NavigateEnv(BaseEnv):
         self.current_step = 0
         self.collision_step = 0
         self.path_length = 0.0
+        self.episode_return = 0.0
         self.geodesic_dist = self.get_geodesic_potential()
 
     def reset(self):
