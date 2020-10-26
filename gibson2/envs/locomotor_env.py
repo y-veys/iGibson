@@ -527,7 +527,7 @@ class NavigateEnv(BaseEnv):
         goal = self.global_to_local(self.target_pos)[:2]
         if self.goal_format == 'polar':
             goal = np.array(cartesian_to_polar(goal[0], goal[1]))
-
+            goal = np.array([goal[0], np.sin(goal[1]), np.cos(goal[1])])
         goal = np.append(goal, self.target_pos[2:])
 
         assert goal.shape[0] == self.goal_dim, \
