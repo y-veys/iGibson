@@ -132,17 +132,18 @@ class Viewer:
             # SEGMENTATION MASK OF HEAD 
             # The segmentation mask of the head should show the obstacles, walls, and the goal
             seg_head = self.renderer.render_robot_cameras(modes=('seg'))[0][:, :, 0:1]
-            seg_head = np.clip(seg_head * 255.0 / (7 + num_obstacles), 0.0, 1.0)
-            all_but_goal = seg_head < 1
-            seg_head[all_but_goal] = 0
+            # seg_head = np.clip(seg_head * 255.0 / (7 + num_obstacles), 0.0, 1.0)
+            # all_but_goal = seg_head < 1
+            # seg_head[all_but_goal] = 0
+            seg_head = np.clip(seg_head * 255.0 / 2.0, 0.0, 1.0)
 
             # SEGMENTATION MASK OF WRIST 
             # The segmentation mask of the wrist should only show the goal 
             seg_wrist = self.renderer.render_robot_cameras(modes=('seg'))[1][:, :, 0:1]
-            seg_wrist = np.clip(seg_wrist * 255.0 / (7 + num_obstacles), 0.0, 1.0)
-            all_but_goal = seg_wrist < 1
-            seg_wrist[all_but_goal] = 0
-
+            # seg_wrist = np.clip(seg_wrist * 255.0 / (7 + num_obstacles), 0.0, 1.0)
+            # all_but_goal = seg_wrist < 1
+            # seg_wrist[all_but_goal] = 0
+            seg_wrist = np.clip(seg_wrist * 255.0 / 2.0, 0.0, 1.0)
 
             # DEPTH IMAGE OF HEAD 
             depth_head = self.renderer.render_robot_cameras(modes=('3d'))

@@ -312,7 +312,7 @@ class NavigateEnv(BaseEnv):
             
 
             if self.config.get('target_visual_object_visible_to_agent', False):
-                self.simulator.import_object(self.target_pos_vis_obj)
+                self.simulator.import_object(self.target_pos_vis_obj, class_id=2)
                 #self.simulator.import_object(self.target_pos_vis_obj_exact)
             else:
                 self.target_pos_vis_obj.load()
@@ -338,7 +338,7 @@ class NavigateEnv(BaseEnv):
                                      visual_only=False, 
                                      mass=0, 
                                      color=[1, 1, 0, 0.95])
-            self.simulator.import_object(obstacle)
+            self.simulator.import_object(obstacle, class_id=1)
             obstacle.load()
             self.obstacles.append(obstacle)
 
@@ -372,11 +372,11 @@ class NavigateEnv(BaseEnv):
                            mass=0,
                            color=[1, 1, 1, 1])
 
-        self.simulator.import_object(back_wall)
-        self.simulator.import_object(front_wall)
-        self.simulator.import_object(left_wall)
-        self.simulator.import_object(right_wall)
-        self.simulator.import_object(ceiling)
+        self.simulator.import_object(back_wall, class_id=0)
+        self.simulator.import_object(front_wall, class_id=0)
+        self.simulator.import_object(left_wall, class_id=0)
+        self.simulator.import_object(right_wall, class_id=0)
+        self.simulator.import_object(ceiling, class_id=0)
 
         # back_wall.load()
         # front_wall.load()
@@ -636,10 +636,13 @@ class NavigateEnv(BaseEnv):
         #if self.num_object_classes is not None:
         #    seg = np.clip(seg * 255.0 / self.num_object_classes, 0.0, 1.0)
 
-        seg = np.clip(seg * 255.0 / (self.num_walls + self.num_obstacles + 2) , 0.0, 1.0)
+        # seg = np.clip(seg * 255.0 / (self.num_walls + self.num_obstacles + 2) , 0.0, 1.0)
 
-        all_but_goal = seg < 1
-        seg[all_but_goal] = 0
+        # 0: building, 1: obstacles, 2: goal
+        seg = seg * 255.0 / 2.0
+
+        # all_but_goal = seg < 1
+        # seg[all_but_goal] = 0
 
         return seg
 
@@ -651,10 +654,13 @@ class NavigateEnv(BaseEnv):
         #if self.num_object_classes is not None:
         #    seg = np.clip(seg * 255.0 / self.num_object_classes, 0.0, 1.0)
 
-        seg = np.clip(seg * 255.0 / (self.num_walls + self.num_obstacles + 2) , 0.0, 1.0)
+        # seg = np.clip(seg * 255.0 / (self.num_walls + self.num_obstacles + 2) , 0.0, 1.0)
 
-        all_but_goal = seg < 1
-        seg[all_but_goal] = 0
+        # 0: building, 1: obstacles, 2: goal
+        seg = seg * 255.0 / 2.0
+
+        # all_but_goal = seg < 1
+        # seg[all_but_goal] = 0
 
         return seg
 
