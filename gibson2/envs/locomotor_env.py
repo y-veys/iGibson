@@ -492,10 +492,13 @@ class NavigateEnv(BaseEnv):
 
         base_proprioceptive_states = np.append(base_proprioceptive_states, [linear_velocity, angular_velocity])
 
+        goal = self.get_goal()
+        base_proprioceptive_states = np.append(base_proprioceptive_states, goal)
+
         # Camera location
-        self.robots[0].calc_state()
-        base_proprioceptive_states = np.append(base_proprioceptive_states, np.sin(self.robots[0].joint_position[7]))
-        base_proprioceptive_states = np.append(base_proprioceptive_states, np.cos(self.robots[0].joint_position[7]))
+        # self.robots[0].calc_state()
+        # base_proprioceptive_states = np.append(base_proprioceptive_states, np.sin(self.robots[0].joint_position[7]))
+        # base_proprioceptive_states = np.append(base_proprioceptive_states, np.cos(self.robots[0].joint_position[7]))
 
         assert base_proprioceptive_states.shape[0] == self.base_proprioceptive_states_dim, \
             'base proprioceptive states dimension mismatch {} v.s. {}'.format(base_proprioceptive_states.shape[0], self.base_proprioceptive_states_dim)
@@ -527,8 +530,9 @@ class NavigateEnv(BaseEnv):
         goal = self.global_to_local(self.target_pos)[:2]
         if self.goal_format == 'polar':
             goal = np.array(cartesian_to_polar(goal[0], goal[1]))
+            goal = np.array([goal[0], np.sin(goal[1]), np.cos(goal[1])])
 
-        goal = np.append(goal, self.target_pos[2:])
+        # goal = np.append(goal, self.target_pos[2:])
 
         assert goal.shape[0] == self.goal_dim, \
             'goal state dimension mismatch {} v.s. {}'.format(goal.shape[0], self.goal_dim)
@@ -970,6 +974,7 @@ class NavigateEnv(BaseEnv):
         :param action: a list of control signals
         :return: state, reward, done, info
         """
+        action = np.append(action, [0.0] * 5)
         self.current_step += 1
         if action is not None:
             self.robots[0].apply_action(action)
@@ -1532,6 +1537,7 @@ if __name__ == '__main__':
         nav_env.reset()
         for _ in range(100):  # 10 seconds
             action = nav_env.action_space.sample()
+            action = action[:2]
             state, reward, done, _ = nav_env.step(action)
             print('reward', reward)
             if done:
